@@ -1,96 +1,123 @@
 import React, { useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
 
     if (!username.trim()) {
       setError('请输入用户名');
+      setIsLoading(false);
       return;
     }
 
     if (!password.trim()) {
       setError('请输入密码');
+      setIsLoading(false);
       return;
     }
 
-    const success = onLogin(username, password);
-    if (!success) {
-      setError('用户名或密码不正确');
+    try {
+      // 模拟网络延迟
+      await new Promise(resolve => setTimeout(resolve, 800));
+      const success = onLogin(username, password);
+      if (!success) {
+        setError('用户名或密码不正确');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="text-center text-3xl font-extrabold text-gray-900">
-          网页收藏与日记
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          登录您的账户
-        </p>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div className="rounded-md bg-red-50 p-4">
-                <div className="flex">
-                  <div className="text-sm text-red-700">
-                    {error}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+    <div className="container-fluid bg-light min-vh-100 d-flex align-items-center justify-content-center py-5">
+      <div className="card border-0 shadow-lg" style={{ maxWidth: '400px', width: '100%' }}>
+        <div className="card-header bg-primary text-white text-center py-4">
+          <h2 className="mb-0 fs-4">Daily Satori</h2>
+          <p className="mb-0 small">记录当下，思考未来</p>
+        </div>
+        <div className="card-body p-4">
+          {error && (
+            <div className="alert alert-danger py-2 small" role="alert">
+              <i className="bi bi-exclamation-triangle-fill me-2"></i>
+              {error}
+            </div>
+          )}
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="username" className="form-label small fw-bold">
                 用户名
               </label>
-              <div className="mt-1">
+              <div className="input-group input-group-sm">
+                <span className="input-group-text">
+                  <i className="bi bi-person-fill"></i>
+                </span>
                 <input
-                  id="username"
-                  name="username"
                   type="text"
-                  autoComplete="username"
-                  required
+                  className="form-control"
+                  id="username"
+                  placeholder="请输入用户名"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="input w-full"
+                  required
                 />
               </div>
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label small fw-bold">
                 密码
               </label>
-              <div className="mt-1">
+              <div className="input-group input-group-sm">
+                <span className="input-group-text">
+                  <i className="bi bi-lock-fill"></i>
+                </span>
                 <input
-                  id="password"
-                  name="password"
                   type="password"
-                  autoComplete="current-password"
-                  required
+                  className="form-control"
+                  id="password"
+                  placeholder="请输入密码"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="input w-full"
+                  required
                 />
               </div>
             </div>
 
-            <div>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+              <div className="form-check">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id="rememberMe"
+                />
+                <label className="form-check-label small" htmlFor="rememberMe">
+                  记住我
+                </label>
+              </div>
+              <a href="#" className="text-decoration-none small">忘记密码?</a>
+            </div>
+
+            <div className="d-grid">
               <button
                 type="submit"
-                className="btn btn-primary w-full"
+                className="btn btn-primary"
+                disabled={isLoading}
               >
-                登录
+                {isLoading ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    登录中...
+                  </>
+                ) : '登录'}
               </button>
             </div>
           </form>

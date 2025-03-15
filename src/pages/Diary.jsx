@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const Diary = () => {
   const [entries, setEntries] = useState([]);
@@ -67,56 +69,80 @@ const Diary = () => {
     return textOnly.length > 100 ? textOnly.substring(0, 100) + '...' : textOnly;
   };
 
+  // 获取随机卡片背景色
+  const getCardColor = (id) => {
+    const colors = [
+      'bg-light',
+      'bg-white',
+      'bg-info bg-opacity-10',
+      'bg-success bg-opacity-10',
+      'bg-warning bg-opacity-10',
+      'bg-primary bg-opacity-10'
+    ];
+
+    // 基于ID确定一个固定的颜色，使相同ID始终显示相同颜色
+    const colorIndex = id % colors.length;
+    return colors[colorIndex];
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">我的日记</h1>
+    <div className="container py-5">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h1 className="h3">我的日记</h1>
         <button
           onClick={handleCreateNewEntry}
-          className="btn btn-primary flex items-center"
+          className="btn btn-primary"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
+          <i className="bi bi-plus-lg me-2"></i>
           新建日记
         </button>
       </div>
 
       {entries.length === 0 ? (
-        <div className="text-center py-10">
-          <p className="text-gray-500">还没有日记，创建一篇吧！</p>
+        <div className="text-center py-5">
+          <div className="py-5">
+            <i className="bi bi-journal-text display-1 text-secondary opacity-50"></i>
+            <p className="mt-3 text-muted">还没有日记，创建一篇吧！</p>
+          </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
           {entries.map(entry => (
-            <Link
-              key={entry.id}
-              to={`/diary/${entry.id}`}
-              className="block"
-            >
-              <div className="card hover:shadow-lg transition-shadow h-full flex flex-col">
-                <div className="p-6 flex-grow">
-                  <div className="flex justify-between items-start">
-                    <h2 className="text-lg font-semibold text-gray-900 truncate">{entry.title}</h2>
-                    <button
-                      onClick={(e) => handleDeleteEntry(entry.id, e)}
-                      className="text-gray-400 hover:text-gray-600"
-                      title="删除"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+            <div key={entry.id} className="col">
+              <Link
+                to={`/diary/${entry.id}`}
+                className="text-decoration-none text-dark"
+              >
+                <div className={`card h-100 shadow-sm ${getCardColor(entry.id)}`}>
+                  <div className="card-body">
+                    <div className="d-flex justify-content-between align-items-start mb-2">
+                      <h5 className="card-title text-truncate mb-0">{entry.title}</h5>
+                      <button
+                        onClick={(e) => handleDeleteEntry(entry.id, e)}
+                        className="btn btn-sm text-danger border-0"
+                        title="删除"
+                      >
+                        <i className="bi bi-trash"></i>
+                      </button>
+                    </div>
+                    <p className="card-subtitle mb-3 text-muted small">
+                      <i className="bi bi-calendar-event me-1"></i>
+                      {formatDate(entry.updatedAt)}
+                    </p>
+                    <p className="card-text" style={{ display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {getEntrySummary(entry.content)}
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {formatDate(entry.updatedAt)}
-                  </p>
-                  <p className="text-sm text-gray-700 mt-4 line-clamp-3">
-                    {getEntrySummary(entry.content)}
-                  </p>
+                  <div className="card-footer border-top-0 bg-transparent">
+                    <div className="d-flex justify-content-end">
+                      <span className="text-primary small">
+                        查看详情 <i className="bi bi-arrow-right"></i>
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
+            </div>
           ))}
         </div>
       )}

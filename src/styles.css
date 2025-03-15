@@ -1,95 +1,105 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* 自定义Bootstrap主题和额外样式 */
 
-@layer base {
-  body {
-    background-color: var(--neutral-faint);
-    color: var(--neutral-intense);
-  }
+:root {
+  --bs-primary: #0d6efd;
+  --bs-primary-rgb: 13, 110, 253;
+  --bs-primary-light: #cfe2ff;
+
+  --bs-secondary: #6c757d;
+  --bs-secondary-rgb: 108, 117, 125;
+
+  --neutral-faint: #f8f9fa;
+  --neutral-muted: #dee2e6;
+  --neutral-medium: #6c757d;
+  --neutral-intense: #212529;
+
+  --primary: var(--bs-primary);
+  --primary-soft: #e6f0ff;
+  --primary-strong: #0a58ca;
+
+  --secondary: var(--bs-secondary);
+  --secondary-strong: #5c636a;
 }
 
-@layer components {
-  .btn {
+body {
+  background-color: var(--neutral-faint);
+  color: var(--neutral-intense);
+}
+
+/* 定制卡片阴影效果 */
+.card {
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+}
+
+/* 自定义导航链接样式 */
+.navlink {
+  color: var(--neutral-medium);
+  padding: 0.75rem 1rem;
+  transition: color 0.15s ease-in-out;
+}
+
+.navlink:hover {
+  color: var(--primary-strong);
+  border-bottom: 2px solid var(--primary-soft);
+  text-decoration: none;
+}
+
+.navlink-active {
+  color: var(--primary-strong);
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid var(--primary);
+}
+
+/* 自定义按钮悬停效果 */
+.btn-outline-primary:hover {
+  background-color: var(--primary-soft);
+  color: var(--primary-strong);
+  border-color: var(--primary);
+}
+
+/* 删除按钮样式 */
+.delete-btn {
+  opacity: 0.7;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.delete-btn:hover {
+  opacity: 1;
+}
+
+/* 截断文本 */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 自定义动画 */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* 响应式调整 */
+@media (max-width: 576px) {
+  .container {
     padding-left: 1rem;
     padding-right: 1rem;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    border-radius: 0.5rem;
-    font-weight: 500;
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
-  }
-
-  .btn-primary {
-    background-color: var(--primary);
-    color: white;
-  }
-
-  .btn-primary:hover {
-    background-color: var(--primary-strong);
-  }
-
-  .btn-secondary {
-    background-color: var(--secondary);
-    color: white;
-  }
-
-  .btn-secondary:hover {
-    background-color: var(--secondary-strong);
-  }
-
-  .card {
-    background-color: white;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    padding: 1.5rem;
-  }
-
-  .input {
-    padding-left: 1rem;
-    padding-right: 1rem;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    border-width: 1px;
-    border-color: var(--neutral-muted);
-    border-radius: 0.5rem;
-  }
-
-  .input:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px var(--primary);
-    border-color: transparent;
-  }
-
-  /* 导航链接样式 */
-  .navlink {
-    color: var(--neutral-medium);
-    padding: 0.75rem 1rem;
-    transition-property: color;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
-  }
-
-  .navlink:hover {
-    color: var(--primary-strong);
-    border-bottom: 2px solid var(--primary-soft);
-  }
-
-  .navlink-active {
-    color: var(--primary-strong);
-    padding: 0.75rem 1rem;
-    border-bottom: 2px solid var(--primary);
-  }
-
-  .logout-button {
-    transition-property: color;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
-  }
-
-  .logout-button:hover {
-    color: var(--primary-strong);
   }
 }

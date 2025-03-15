@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const Articles = () => {
   const [articles, setArticles] = useState([]);
@@ -77,71 +79,96 @@ const Articles = () => {
     saveArticles(updatedArticles);
   };
 
+  // 格式化日期
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">我的网页收藏</h1>
-
-        <form onSubmit={handleAddArticle} className="flex space-x-2">
-          <input
-            type="text"
-            value={newUrl}
-            onChange={(e) => setNewUrl(e.target.value)}
-            placeholder="输入网址以添加收藏"
-            className="input flex-grow"
-            disabled={isLoading}
-          />
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={isLoading}
-          >
-            {isLoading ? '添加中...' : '添加'}
-          </button>
-        </form>
-
-        {error && (
-          <p className="mt-2 text-sm text-red-600">{error}</p>
-        )}
+    <div className="container py-5">
+      <div className="row mb-4">
+        <div className="col-lg-10 col-md-8">
+          <h1 className="h3 mb-3">我的网页收藏</h1>
+          <form onSubmit={handleAddArticle} className="input-group mb-3">
+            <input
+              type="text"
+              className="form-control"
+              value={newUrl}
+              onChange={(e) => setNewUrl(e.target.value)}
+              placeholder="输入网址以添加收藏"
+              disabled={isLoading}
+            />
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  添加中...
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-plus"></i> 添加
+                </>
+              )}
+            </button>
+          </form>
+          {error && (
+            <div className="alert alert-danger py-2" role="alert">
+              {error}
+            </div>
+          )}
+        </div>
       </div>
 
       {articles.length === 0 ? (
-        <div className="text-center py-10">
-          <p className="text-gray-500">还没有收藏任何网页，添加一个吧！</p>
+        <div className="text-center py-5">
+          <div className="py-5">
+            <i className="bi bi-journal-bookmark display-1 text-secondary opacity-50"></i>
+            <p className="mt-3 text-muted">还没有收藏任何网页，添加一个吧！</p>
+          </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
           {articles.map(article => (
-            <div key={article.id} className="card hover:shadow-lg transition-shadow">
-              <div className="relative">
-                <img
-                  src={article.screenshot}
-                  alt={article.title}
-                  className="w-full h-40 object-cover rounded-t-xl"
-                />
-                <button
-                  onClick={() => handleDeleteArticle(article.id)}
-                  className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
-                  title="删除"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              <div className="p-4">
-                <h2 className="text-lg font-semibold text-gray-900 truncate">{article.title}</h2>
-                <p className="text-sm text-gray-500 mt-1 truncate">{article.url}</p>
-                <p className="text-sm text-gray-700 mt-2 line-clamp-2">{article.summary}</p>
-
-                <div className="mt-4">
-                  <Link
-                    to={`/articles/${article.id}`}
-                    className="text-primary-600 font-medium hover:text-primary-700"
+            <div key={article.id} className="col">
+              <div className="card h-100 shadow-sm">
+                <div className="position-relative">
+                  <img
+                    src={article.screenshot}
+                    alt={article.title}
+                    className="card-img-top"
+                    style={{ height: '160px', objectFit: 'cover' }}
+                  />
+                  <button
+                    onClick={() => handleDeleteArticle(article.id)}
+                    className="btn btn-sm btn-light position-absolute top-0 end-0 m-2"
+                    title="删除"
                   >
-                    查看详情
-                  </Link>
+                    <i className="bi bi-trash"></i>
+                  </button>
+                </div>
+                <div className="card-body">
+                  <h5 className="card-title text-truncate">{article.title}</h5>
+                  <p className="card-text text-muted small text-truncate">{article.url}</p>
+                  <p className="card-text" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    {article.summary}
+                  </p>
+                </div>
+                <div className="card-footer bg-white border-top-0">
+                  <div className="d-flex justify-content-between align-items-center">
+                    <small className="text-muted">{formatDate(article.savedAt)}</small>
+                    <Link to={`/articles/${article.id}`} className="btn btn-sm btn-outline-primary">
+                      查看详情
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>

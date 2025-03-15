@@ -45,10 +45,10 @@ const App = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="min-vh-100 d-flex flex-column">
       {isAuthenticated && <Navbar onLogout={handleLogout} />}
 
-      <main className="flex-grow">
+      <main className="flex-grow-1">
         <Routes>
           <Route path="/login" element={
             isAuthenticated
