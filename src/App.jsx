@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Login from './pages/Login.jsx';
 import Articles from './pages/Articles.jsx';
-import ArticleDetail from './pages/ArticleDetail.jsx';
 import Diary from './pages/Diary.jsx';
-import DiaryEntry from './pages/DiaryEntry.jsx';
 import Navbar from './components/Navbar.jsx';
 
 const App = () => {
@@ -64,7 +62,7 @@ const App = () => {
 
           <Route path="/articles/:id" element={
             <ProtectedRoute>
-              <ArticleDetail />
+              <Articles />
             </ProtectedRoute>
           } />
 
@@ -76,7 +74,7 @@ const App = () => {
 
           <Route path="/diary/:id" element={
             <ProtectedRoute>
-              <DiaryEntry />
+              <Diary />
             </ProtectedRoute>
           } />
 

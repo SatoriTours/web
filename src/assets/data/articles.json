@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "title": "理解React Hooks的工作原理",
+    "url": "https://reactjs.org/docs/hooks-intro.html",
+    "summary": "这篇文章深入解释了React Hooks的工作原理和使用场景。Hooks允许我们在函数组件中使用状态和其他React特性，而不需要编写类组件。文章详细介绍了useState和useEffect等常用Hook的实现原理和最佳实践。",
+    "favicon": "https://reactjs.org/favicon.ico",
+    "screenshot": "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
+    "addedAt": "2023-01-15T10:30:45.123Z"
+  },
+  {
+    "id": 2,
+    "title": "JavaScript性能优化的10个技巧",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference",
+    "summary": "本文介绍了提高JavaScript代码性能的10个实用技巧，包括避免全局变量、使用Web Workers处理复杂计算、优化DOM操作、实现代码分割和懒加载等。每个技巧都附有代码示例和性能对比数据。",
+    "favicon": "https://developer.mozilla.org/favicon-48x48.png",
+    "screenshot": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
+    "addedAt": "2023-01-20T14:45:22.789Z"
+  },
+  {
+    "id": 3,
+    "title": "CSS Grid完全指南",
+    "url": "https://css-tricks.com/snippets/css/complete-guide-grid/",
+    "summary": "这是一篇关于CSS Grid布局的完整指南，涵盖了从基础概念到高级应用的所有内容。文章详细讲解了网格容器、网格项、网格线和网格区域等核心概念，并提供了丰富的示例说明如何创建复杂的响应式布局。",
+    "favicon": "https://css-tricks.com/favicon.ico",
+    "screenshot": "https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
+    "addedAt": "2023-02-05T09:15:30.456Z"
+  },
+  {
+    "id": 4,
+    "title": "现代JavaScript工具链指南",
+    "url": "https://webpack.js.org/guides/getting-started/",
+    "summary": "本文介绍了现代JavaScript开发中常用的工具链，包括Webpack、Babel、ESLint等工具的配置和使用方法。文章还讨论了如何根据项目需求选择合适的工具，以及如何优化构建流程以提高开发效率。",
+    "favicon": "https://webpack.js.org/favicon.ico",
+    "screenshot": "https://images.unsplash.com/photo-1566837945700-30057527ade0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
+    "addedAt": "2023-02-18T16:20:10.123Z"
+  },
+  {
+    "id": 5,
+    "title": "深入理解TypeScript类型系统",
+    "url": "https://www.typescriptlang.org/docs/",
+    "summary": "这篇文章深入探讨了TypeScript的类型系统，包括基本类型、接口、泛型、条件类型和映射类型等高级特性。文章通过实际例子展示了如何利用TypeScript的类型系统来提高代码质量和开发效率，同时避免常见的类型错误。",
+    "favicon": "https://www.typescriptlang.org/favicon.ico",
+    "screenshot": "https://images.unsplash.com/photo-1564865878688-9a244444042a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
+    "addedAt": "2023-03-02T11:35:48.789Z"
+  },
+  {
+    "id": 6,
+    "title": "Web应用安全最佳实践",
+    "url": "https://owasp.org/www-project-top-ten/",
+    "summary": "本文概述了Web应用安全的最佳实践，重点关注OWASP Top 10安全风险。文章详细讲解了如何防止常见的安全漏洞，包括XSS攻击、SQL注入、CSRF攻击等，并提供了具体的代码示例和安全检查清单。",
+    "favicon": "https://owasp.org/favicon.ico",
+    "screenshot": "https://images.unsplash.com/photo-1563206767-5b18f218e8de?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
+    "addedAt": "2023-03-15T08:50:33.456Z"
+  }
+]
