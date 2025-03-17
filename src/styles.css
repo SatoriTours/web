@@ -29,14 +29,14 @@ body {
 
 /* 定制卡片阴影效果 */
 .card {
-  transition: all 0.2s ease;
-  border: none;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  transition: none !important;
+  border: 1px solid transparent !important;
+  margin: 0.5rem 0 !important;
 }
 
 .card:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  transform: translateY(-2px);
+  transform: none !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
 }
 
 /* 拖拽分隔线样式 */
@@ -148,10 +148,9 @@ div[style*="overflow: auto"]::-webkit-scrollbar-thumb:hover {
 
 /* 列表项样式 */
 .list-group-item-action {
-  transition: all 0.15s ease;
-  border-left: 3px solid transparent;
-  position: relative;
-  padding: 0.75rem 1rem;
+  transition: none !important;
+  border-left-width: 3px !important;
+  padding: 0.75rem 1rem !important;
 }
 
 .list-group-item-action:hover {
@@ -288,15 +287,31 @@ div[style*="overflow: auto"]::-webkit-scrollbar-thumb:hover {
   flex-direction: row !important;
 }
 
+/* 确保按钮组中的按钮有足够宽度，避免文字换行 */
+.btn-group .btn {
+  min-width: 80px;
+  white-space: nowrap;
+}
+
 /* Markdown编辑器样式覆盖 */
 .w-md-editor {
   box-shadow: none !important;
   border: 1px solid var(--neutral-muted);
   border-radius: 0.375rem;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.w-md-editor-content {
+  width: 100% !important;
 }
 
 .w-md-editor-toolbar {
   border-bottom: 1px solid var(--neutral-muted) !important;
+  min-height: 48px !important;
+  padding: 4px 0 !important;
+  display: flex !important;
+  align-items: center !important;
 }
 
 .w-md-editor-text {
@@ -308,6 +323,21 @@ div[style*="overflow: auto"]::-webkit-scrollbar-thumb:hover {
 .w-md-editor-toolbar ul,
 .w-md-editor-toolbar li {
   margin: 0 !important;
+}
+
+/* 增大富文本编辑器工具栏图标大小并调整对齐 */
+.w-md-editor-toolbar svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.w-md-editor-toolbar button {
+  padding: 6px 8px !important;
+  margin: 0 2px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 36px !important;
 }
 
 /* 暗色模式支持 */
@@ -395,8 +425,8 @@ body.dark-mode .form-control:focus {
 /* 卡片悬停效果 */
 .diary-list .card:hover,
 .article-list .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08) !important;
+  transform: none !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
 }
 
 /* 用于显示在卡片中的日期和标签 */
@@ -440,4 +470,33 @@ body.dark-mode .form-control:focus {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* 移除编辑器容器的内边距 */
+div[data-color-mode] {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+/* 修复左侧栏选中项的样式问题 */
+.list-group-item-action,
+.list-group-item-action.active,
+.list-group-item-action:hover {
+  transform: none !important;
+  transition: none !important;
+  padding: 0.75rem 1rem !important;
+  border-left-width: 3px !important;
+}
+
+/* 修复选中时位置变化问题 */
+.card.border-primary {
+  border-width: 1px !important;
+  margin: 0.5rem 0 !important;
+  padding: 0 !important;
+}
+
+/* 确保卡片主体不受影响 */
+.card-body {
+  padding: 1rem !important;
 }
