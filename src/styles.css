@@ -487,6 +487,7 @@ div[data-color-mode] {
   transition: none !important;
   padding: 0.75rem 1rem !important;
   border-left-width: 3px !important;
+  position: relative !important;
 }
 
 /* 修复选中时位置变化问题 */

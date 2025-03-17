@@ -309,7 +309,7 @@ const Diary = () => {
           <div className="resizer" onMouseDown={handleMouseDown}></div>
           <div className="p-3 border-bottom d-flex justify-content-between align-items-center" style={{backgroundColor: 'var(--primary-50)'}}>
             <div className="d-flex align-items-center">
-              <div className="bg-primary bg-gradient rounded-circle p-2 me-2 text-white">
+              <div className="bg-primary bg-gradient rounded-circle p-2 me-2 text-white d-flex align-items-center justify-content-center" style={{width: '32px', height: '32px'}}>
                 <i className="bi bi-journal-text"></i>
               </div>
               <div>
@@ -386,7 +386,7 @@ const Diary = () => {
                 >
                   <div className="d-flex justify-content-between align-items-start py-2">
                     <div className="w-100 pe-2">
-                      <h6 className="mb-1 text-truncate fw-medium">{entry.title}</h6>
+                      <h6 className="mb-2 text-truncate fw-medium">{entry.title}</h6>
                       <p className="mb-1 small text-muted">
                         <i className="bi bi-calendar2 me-1"></i>
                         {formatDate(entry.createdAt)}
