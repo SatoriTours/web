@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { marked } from 'marked';
+import MDEditor from '@uiw/react-md-editor';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import diaryData from '../assets/data/diary.json';
@@ -16,6 +17,11 @@ const Diary = () => {
   const [editContent, setEditContent] = useState('');
   const [saveStatus, setSaveStatus] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(25); // 初始宽度25%
+  const [isResizing, setIsResizing] = useState(false);
+  const [colorMode, setColorMode] = useState('light'); // 默认亮色模式
+  const sidebarRef = useRef(null);
+  const containerRef = useRef(null);
 
   // 从JSON文件和localStorage加载日记条目
   useEffect(() => {
@@ -42,8 +48,30 @@ const Diary = () => {
       }
     };
 
+    // 加载颜色模式设置
+    const savedColorMode = localStorage.getItem('colorMode');
+    if (savedColorMode) {
+      setColorMode(savedColorMode);
+    }
+
     loadEntries();
   }, []);
+
+  // 保存颜色模式设置并应用到body
+  useEffect(() => {
+    localStorage.setItem('colorMode', colorMode);
+
+    if (colorMode === 'dark') {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+  }, [colorMode]);
+
+  // 切换颜色模式
+  const toggleColorMode = () => {
+    setColorMode(prevMode => prevMode === 'light' ? 'dark' : 'light');
+  };
 
   // 加载选中的日记
   useEffect(() => {
@@ -219,61 +247,71 @@ const Diary = () => {
     }
   };
 
-  // 处理图片上传
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    // 文件大小限制 (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert('图片大小不能超过5MB');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      // 在光标位置插入图片Markdown
-      const imageMarkdown = `![${file.name}](${reader.result})\n`;
-
-      // 获取textarea元素
-      const textarea = document.getElementById('editor');
-      const cursorPos = textarea.selectionStart;
-
-      // 拼接新内容
-      const newContent =
-        editContent.substring(0, cursorPos) +
-        imageMarkdown +
-        editContent.substring(cursorPos);
-
-      setEditContent(newContent);
-
-      // 聚焦并将光标移动到合适位置
-      setTimeout(() => {
-        textarea.focus();
-        textarea.setSelectionRange(
-          cursorPos + imageMarkdown.length,
-          cursorPos + imageMarkdown.length
-        );
-      }, 0);
-    };
-
-    reader.readAsDataURL(file);
-
-    // 清空input，以便能再次选择同一文件
-    e.target.value = '';
+  // 处理拖拽开始
+  const handleMouseDown = (e) => {
+    e.preventDefault();
+    setIsResizing(true);
+    document.body.classList.add('resizing');
   };
 
+  // 处理拖拽过程
+  const handleMouseMove = (e) => {
+    if (!isResizing || !containerRef.current) return;
+
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const newWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+
+    // 限制宽度范围
+    if (newWidth >= 15 && newWidth <= 50) {
+      setSidebarWidth(newWidth);
+    }
+  };
+
+  // 处理拖拽结束
+  const handleMouseUp = () => {
+    setIsResizing(false);
+    document.body.classList.remove('resizing');
+  };
+
+  // 添加和移除全局事件监听器
+  useEffect(() => {
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
+
   return (
-    <div className="container-fluid">
+    <div ref={containerRef} className="container-fluid">
       <div className="row" style={{height: 'calc(100vh - 56px)'}}>
         {/* 左侧列表 */}
-        <div className="col-12 col-md-4 col-lg-3 p-0 border-end" style={{height: '100%', overflow: 'auto'}}>
+        <div
+          ref={sidebarRef}
+          className="p-0 border-end position-relative"
+          style={{
+            height: '100%',
+            overflow: 'auto',
+            width: `${sidebarWidth}%`,
+            transition: isResizing ? 'none' : 'width 0.1s ease'
+          }}
+        >
+          <div className="resizer" onMouseDown={handleMouseDown}></div>
           <div className="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
             <div className="d-flex align-items-center">
               <i className="bi bi-journal-text text-primary me-2"></i>
               <span className="fw-medium">日记 {entries.length}</span>
             </div>
             <div>
+              <button
+                className="btn btn-sm btn-outline-secondary me-2"
+                onClick={toggleColorMode}
+                title={colorMode === 'light' ? '切换到暗色模式' : '切换到亮色模式'}
+              >
+                <i className={`bi ${colorMode === 'light' ? 'bi-moon' : 'bi-sun'}`}></i>
+              </button>
               <button
                 className="btn btn-sm btn-outline-secondary me-2"
                 onClick={handleResetToDefault}
@@ -306,26 +344,41 @@ const Diary = () => {
             </div>
           ) : (
             <div className="list-group list-group-flush">
-              {entries.map(entry => (
+              {entries.map((entry, index) => (
                 <div
-                  key={entry.id}
-                  className={`list-group-item list-group-item-action border-0 border-bottom ${selectedEntry && selectedEntry.id === entry.id ? 'active bg-light' : ''}`}
+                  key={entry.id || index}
+                  className={`list-group-item list-group-item-action border-0 border-bottom position-relative group ${selectedEntry && selectedEntry.id === entry.id ? 'active bg-light' : ''}`}
                   onClick={() => handleSelectEntry(entry)}
                 >
                   <div className="d-flex justify-content-between align-items-start py-1">
-                    <div>
+                    <div className="w-100 pe-2">
                       <h6 className="mb-0 text-truncate">{entry.title}</h6>
                       <p className="mb-0 small text-muted">
                         <i className="bi bi-calendar2 me-1"></i>
-                        {new Date(entry.updatedAt).toLocaleDateString()}
+                        {formatDate(entry.createdAt)}
                       </p>
-                      <p className="mb-0 small text-truncate text-muted">
-                        {getEntrySummary(entry.content).substring(0, 50)}
+                      <p className="mb-0 small text-muted text-wrap overflow-hidden" style={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        textOverflow: 'ellipsis',
+                        maxHeight: '2.5rem'
+                      }}>
+                        {getEntrySummary(entry.content)}
                       </p>
                     </div>
                     <button
-                      onClick={(e) => handleDeleteEntry(entry.id, e)}
-                      className="btn btn-sm text-danger border-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteEntry(entry.id, e);
+                      }}
+                      className="btn btn-sm text-danger border-0 flex-shrink-0 position-absolute end-0 top-0 mt-2 me-2 opacity-0 group-hover:opacity-100"
+                      style={{
+                        opacity: 0,
+                        transition: 'opacity 0.2s ease'
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+                      onMouseOut={(e) => e.currentTarget.style.opacity = 0}
                       title="删除"
                     >
                       <i className="bi bi-trash"></i>
@@ -338,7 +391,12 @@ const Diary = () => {
         </div>
 
         {/* 右侧详情 */}
-        <div className="col-12 col-md-8 col-lg-9 p-0" style={{height: '100%', overflow: 'auto'}}>
+        <div className="p-0" style={{
+          height: '100%',
+          overflow: 'auto',
+          width: `${100 - sidebarWidth}%`,
+          transition: isResizing ? 'none' : 'width 0.1s ease'
+        }}>
           {selectedEntry ? (
             <div className="p-4">
               {isEditing ? (
@@ -378,26 +436,14 @@ const Diary = () => {
                     {selectedEntry.createdAt !== selectedEntry.updatedAt &&
                       ` · 更新于 ${formatDate(selectedEntry.updatedAt)}`}
                   </p>
-                  <div className="my-3">
-                    <label htmlFor="image-upload" className="btn btn-sm btn-outline-secondary me-2">
-                      <i className="bi bi-image me-1"></i>
-                      插入图片
-                    </label>
-                    <input
-                      id="image-upload"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="d-none"
+                  <div data-color-mode={colorMode}>
+                    <MDEditor
+                      value={editContent}
+                      onChange={setEditContent}
+                      height={500}
+                      preview="edit"
                     />
                   </div>
-                  <textarea
-                    id="editor"
-                    className="form-control border-0"
-                    value={editContent}
-                    onChange={(e) => setEditContent(e.target.value)}
-                    style={{ minHeight: '500px', resize: 'vertical' }}
-                  ></textarea>
                 </div>
               ) : (
                 /* 查看模式 */
@@ -420,7 +466,7 @@ const Diary = () => {
                     </button>
                   </div>
                   <div
-                    className="markdown-content py-2"
+                    className={`markdown-content py-2 ${colorMode === 'dark' ? 'text-light' : ''}`}
                     dangerouslySetInnerHTML={{ __html: marked(selectedEntry.content) }}
                   ></div>
                 </div>

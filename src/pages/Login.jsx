@@ -92,7 +92,7 @@ const Login = ({ onLogin }) => {
               </div>
             </div>
 
-            <div className="d-flex justify-content-between align-items-center mb-4">
+            <div className="mb-4">
               <div className="form-check">
                 <input
                   className="form-check-input"
@@ -103,7 +103,6 @@ const Login = ({ onLogin }) => {
                   记住我
                 </label>
               </div>
-              <a href="#" className="text-decoration-none small">忘记密码?</a>
             </div>
 
             <div className="d-grid">

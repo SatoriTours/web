@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { marked } from 'marked';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -16,6 +16,10 @@ const Articles = () => {
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [activeTab, setActiveTab] = useState('summary');
+  const [sidebarWidth, setSidebarWidth] = useState(33); // 初始宽度33%
+  const [isResizing, setIsResizing] = useState(false);
+  const sidebarRef = useRef(null);
+  const containerRef = useRef(null);
 
   // 从JSON文件和localStorage加载文章
   useEffect(() => {
@@ -123,11 +127,21 @@ const Articles = () => {
   // 格式化日期
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('zh-CN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    const now = new Date();
+    const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      return `今天 ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+    } else if (diffDays === 1) {
+      return '昨天';
+    } else if (diffDays < 7) {
+      return `${diffDays}天前`;
+    } else {
+      return date.toLocaleDateString('zh-CN', {
+        month: 'numeric',
+        day: 'numeric'
+      });
+    }
   };
 
   // 重置为初始数据
@@ -144,11 +158,58 @@ const Articles = () => {
     setSelectedArticle(article);
   };
 
+  // 处理拖拽开始
+  const handleMouseDown = (e) => {
+    e.preventDefault();
+    setIsResizing(true);
+    document.body.classList.add('resizing');
+  };
+
+  // 处理拖拽过程
+  const handleMouseMove = (e) => {
+    if (!isResizing || !containerRef.current) return;
+
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const newWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+
+    // 限制宽度范围
+    if (newWidth >= 15 && newWidth <= 50) {
+      setSidebarWidth(newWidth);
+    }
+  };
+
+  // 处理拖拽结束
+  const handleMouseUp = () => {
+    setIsResizing(false);
+    document.body.classList.remove('resizing');
+  };
+
+  // 添加和移除全局事件监听器
+  useEffect(() => {
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
+
   return (
-    <div className="container-fluid">
+    <div ref={containerRef} className="container-fluid">
       <div className="row" style={{height: 'calc(100vh - 56px)'}}>
         {/* 左侧列表 */}
-        <div className="col-12 col-md-5 col-lg-4 p-0 border-end" style={{height: '100%', overflow: 'auto'}}>
+        <div
+          ref={sidebarRef}
+          className="p-0 border-end position-relative"
+          style={{
+            height: '100%',
+            overflow: 'auto',
+            width: `${sidebarWidth}%`,
+            transition: isResizing ? 'none' : 'width 0.1s ease'
+          }}
+        >
+          <div className="resizer" onMouseDown={handleMouseDown}></div>
           <div className="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
             <div className="d-flex align-items-center">
               <i className="bi bi-bookmark-fill text-primary me-2"></i>
@@ -190,7 +251,7 @@ const Articles = () => {
               {articles.map(article => (
                 <div
                   key={article.id}
-                  className={`list-group-item list-group-item-action border-0 border-bottom ${selectedArticle && selectedArticle.id === article.id ? 'active bg-light' : ''}`}
+                  className={`list-group-item list-group-item-action border-0 border-bottom position-relative ${selectedArticle && selectedArticle.id === article.id ? 'active bg-light' : ''}`}
                   onClick={() => handleSelectArticle(article)}
                 >
                   <div className="d-flex align-items-start py-1">
@@ -201,19 +262,34 @@ const Articles = () => {
                         <i className="bi bi-globe"></i>
                       )}
                     </div>
-                    <div className="flex-grow-1 overflow-hidden">
+                    <div className="flex-grow-1 overflow-hidden pe-4">
                       <h6 className="mb-0 text-truncate">{article.title}</h6>
-                      <p className="mb-0 small text-truncate text-muted">
-                        {article.url.replace(/^https?:\/\/(www\.)?/, '')}
+                      <p className="mb-0 small text-muted text-wrap overflow-hidden" style={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        textOverflow: 'ellipsis',
+                        maxHeight: '2.5rem'
+                      }}>
+                        {article.summary}
                       </p>
-                      <small className="text-muted">{formatDate(article.addedAt)}</small>
+                      <small className="text-muted d-inline-block">
+                        <i className="bi bi-clock me-1"></i>
+                        {formatDate(article.addedAt)}
+                      </small>
                     </div>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDeleteArticle(article.id);
                       }}
-                      className="btn btn-sm text-danger border-0"
+                      className="btn btn-sm text-danger border-0 position-absolute end-0 top-0 mt-2 me-2"
+                      style={{
+                        opacity: 0,
+                        transition: 'opacity 0.2s ease'
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+                      onMouseOut={(e) => e.currentTarget.style.opacity = 0}
                       title="删除"
                     >
                       <i className="bi bi-trash"></i>
@@ -226,7 +302,12 @@ const Articles = () => {
         </div>
 
         {/* 右侧详情 */}
-        <div className="col-12 col-md-7 col-lg-8 p-0" style={{height: '100%', overflow: 'auto'}}>
+        <div className="p-0" style={{
+          height: '100%',
+          overflow: 'auto',
+          width: `${100 - sidebarWidth}%`,
+          transition: isResizing ? 'none' : 'width 0.1s ease'
+        }}>
           {selectedArticle ? (
             <div className="p-4">
               <div className="mb-4">
@@ -243,10 +324,10 @@ const Articles = () => {
               </div>
 
               <div className="mb-3 border-bottom">
-                <ul className="nav">
+                <ul className="nav nav-tabs border-0">
                   <li className="nav-item">
                     <button
-                      className={`btn btn-link px-3 py-2 text-decoration-none ${activeTab === 'summary' ? 'text-primary fw-medium border-bottom border-2 border-primary' : 'text-secondary'}`}
+                      className={`btn btn-link px-3 py-2 text-decoration-none border-0 ${activeTab === 'summary' ? 'text-primary fw-medium border-bottom border-2 border-primary' : 'text-secondary'}`}
                       onClick={() => setActiveTab('summary')}
                     >
                       摘要
@@ -254,7 +335,7 @@ const Articles = () => {
                   </li>
                   <li className="nav-item">
                     <button
-                      className={`btn btn-link px-3 py-2 text-decoration-none ${activeTab === 'preview' ? 'text-primary fw-medium border-bottom border-2 border-primary' : 'text-secondary'}`}
+                      className={`btn btn-link px-3 py-2 text-decoration-none border-0 ${activeTab === 'preview' ? 'text-primary fw-medium border-bottom border-2 border-primary' : 'text-secondary'}`}
                       onClick={() => setActiveTab('preview')}
                     >
                       预览
@@ -263,7 +344,7 @@ const Articles = () => {
                 </ul>
               </div>
 
-              <div className="py-2">
+              <div className="py-2" style={{ minHeight: '300px' }}>
                 {activeTab === 'summary' ? (
                   <div>
                     <p className="mb-4">{selectedArticle.summary}</p>
