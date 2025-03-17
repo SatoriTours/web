@@ -1,12 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-const Login = ({ onLogin }) => {
+const Login = ({ onLogin, isAuthenticated }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // 当isAuthenticated变为true时，重定向到首页或者之前尝试访问的页面
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = location.state?.from?.pathname || '/';
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, location]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,7 +39,7 @@ const Login = ({ onLogin }) => {
     try {
       // 模拟网络延迟
       await new Promise(resolve => setTimeout(resolve, 800));
-      const success = onLogin(username, password);
+      const success = await onLogin(username, password);
       if (!success) {
         setError('用户名或密码不正确');
       }
