@@ -16,7 +16,11 @@ const Articles = () => {
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [activeTab, setActiveTab] = useState('summary');
-  const [sidebarWidth, setSidebarWidth] = useState(33); // 初始宽度33%
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    // 从localStorage获取保存的宽度，如果没有则使用默认值30%
+    const savedWidth = localStorage.getItem('sidebarWidth');
+    return savedWidth ? parseFloat(savedWidth) : 30;
+  });
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef(null);
   const containerRef = useRef(null);
@@ -182,6 +186,9 @@ const Articles = () => {
   const handleMouseUp = () => {
     setIsResizing(false);
     document.body.classList.remove('resizing');
+
+    // 保存当前宽度到localStorage
+    localStorage.setItem('sidebarWidth', sidebarWidth.toString());
   };
 
   // 添加和移除全局事件监听器
@@ -196,21 +203,22 @@ const Articles = () => {
   }, [isResizing]);
 
   return (
-    <div ref={containerRef} className="container-fluid">
+    <div ref={containerRef} className="container-fluid bg-light">
       <div className="row" style={{height: 'calc(100vh - 56px)'}}>
         {/* 左侧列表 */}
         <div
           ref={sidebarRef}
-          className="p-0 border-end position-relative"
+          className="p-0 border-end position-relative shadow-sm"
           style={{
             height: '100%',
             overflow: 'auto',
             width: `${sidebarWidth}%`,
-            transition: isResizing ? 'none' : 'width 0.1s ease'
+            transition: isResizing ? 'none' : 'width 0.2s ease',
+            backgroundColor: 'white'
           }}
         >
           <div className="resizer" onMouseDown={handleMouseDown}></div>
-          <div className="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+          <div className="p-3 border-bottom d-flex justify-content-between align-items-center" style={{backgroundColor: 'var(--primary-50)'}}>
             <div className="d-flex align-items-center">
               <i className="bi bi-bookmark-fill text-primary me-2"></i>
               <span className="fw-medium">已收藏 {articles.length}</span>
@@ -232,6 +240,20 @@ const Articles = () => {
             </div>
           </div>
 
+          <div className="p-2">
+            <div className="input-group mb-3">
+              <span className="input-group-text bg-white border-end-0">
+                <i className="bi bi-search text-muted"></i>
+              </span>
+              <input
+                type="text"
+                className="form-control border-start-0"
+                placeholder="搜索收藏..."
+                aria-label="搜索收藏"
+              />
+            </div>
+          </div>
+
           {!isDataLoaded ? (
             <div className="text-center py-5">
               <div className="spinner-border text-primary" role="status">
@@ -242,34 +264,40 @@ const Articles = () => {
           ) : articles.length === 0 ? (
             <div className="text-center py-5">
               <div className="py-5">
-                <i className="bi bi-journal-bookmark display-1 text-secondary opacity-50"></i>
-                <p className="mt-3 text-muted">还没有收藏任何网页，添加一个吧！</p>
+                <div className="bg-light rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style={{width: '80px', height: '80px'}}>
+                  <i className="bi bi-bookmark display-4 text-primary opacity-75"></i>
+                </div>
+                <h5 className="mb-2">还没有收藏</h5>
+                <p className="text-muted mb-4">点击右上角的添加按钮收藏你喜欢的网页</p>
+                <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+                  <i className="bi bi-plus me-1"></i>添加收藏
+                </button>
               </div>
             </div>
           ) : (
-            <div className="list-group list-group-flush">
+            <div className="list-group list-group-flush fade-in">
               {articles.map(article => (
                 <div
                   key={article.id}
-                  className={`list-group-item list-group-item-action border-0 border-bottom position-relative ${selectedArticle && selectedArticle.id === article.id ? 'active bg-light' : ''}`}
+                  className={`list-group-item list-group-item-action border-0 border-bottom position-relative ${selectedArticle && selectedArticle.id === article.id ? 'active' : ''}`}
                   onClick={() => handleSelectArticle(article)}
                 >
-                  <div className="d-flex align-items-start py-1">
-                    <div className="flex-shrink-0 me-2">
+                  <div className="d-flex align-items-start py-2">
+                    <div className="flex-shrink-0 me-2 mt-1">
                       {article.favicon ? (
-                        <img src={article.favicon} alt="" width="16" height="16" />
+                        <img src={article.favicon} alt="" width="18" height="18" style={{borderRadius: 'var(--radius-sm)'}} />
                       ) : (
-                        <i className="bi bi-globe"></i>
+                        <i className="bi bi-globe text-primary"></i>
                       )}
                     </div>
                     <div className="flex-grow-1 overflow-hidden pe-4">
-                      <h6 className="mb-0 text-truncate">{article.title}</h6>
-                      <p className="mb-0 small text-muted text-wrap overflow-hidden" style={{
+                      <h6 className="mb-1 text-truncate fw-medium">{article.title}</h6>
+                      <p className="mb-1 small text-muted text-wrap overflow-hidden summary-text" style={{
                         display: '-webkit-box',
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
                         textOverflow: 'ellipsis',
-                        maxHeight: '2.5rem'
+                        lineHeight: '1.4'
                       }}>
                         {article.summary}
                       </p>
@@ -302,94 +330,122 @@ const Articles = () => {
         </div>
 
         {/* 右侧详情 */}
-        <div className="p-0" style={{
+        <div className="p-0 bg-white" style={{
           height: '100%',
           overflow: 'auto',
           width: `${100 - sidebarWidth}%`,
-          transition: isResizing ? 'none' : 'width 0.1s ease'
+          transition: isResizing ? 'none' : 'width 0.2s ease'
         }}>
           {selectedArticle ? (
-            <div className="p-4">
-              <div className="mb-4">
-                <h2 className="h4 mb-1">{selectedArticle.title}</h2>
-                <p className="text-muted">
-                  <a href={selectedArticle.url} target="_blank" rel="noopener noreferrer" className="text-decoration-none">
-                    {selectedArticle.url}
-                    <i className="bi bi-box-arrow-up-right ms-1"></i>
+            <div className="p-4 slide-in-right">
+              <div className="mb-4 border-bottom pb-3">
+                <div className="d-flex align-items-start justify-content-between mb-2">
+                  <h2 className="h4 mb-0 fw-bold">{selectedArticle.title}</h2>
+                  <a
+                    href={selectedArticle.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-sm btn-outline-primary"
+                  >
+                    <i className="bi bi-box-arrow-up-right me-1"></i>
+                    访问原网页
                   </a>
+                </div>
+                <p className="text-muted small mb-0">
+                  <i className="bi bi-link-45deg me-1"></i>
+                  {selectedArticle.url}
                 </p>
                 <p className="text-muted small">
+                  <i className="bi bi-calendar-check me-1"></i>
                   保存于 {new Date(selectedArticle.addedAt).toLocaleString('zh-CN')}
                 </p>
               </div>
 
-              <div className="mb-3 border-bottom">
-                <ul className="nav nav-tabs border-0">
+              <div className="mb-4">
+                <ul className="nav nav-pills mb-3">
                   <li className="nav-item">
                     <button
-                      className={`btn btn-link px-3 py-2 text-decoration-none border-0 ${activeTab === 'summary' ? 'text-primary fw-medium border-bottom border-2 border-primary' : 'text-secondary'}`}
+                      className={`nav-link px-4 ${activeTab === 'summary' ? 'active' : ''}`}
                       onClick={() => setActiveTab('summary')}
                     >
+                      <i className="bi bi-card-text me-1"></i>
                       摘要
                     </button>
                   </li>
                   <li className="nav-item">
                     <button
-                      className={`btn btn-link px-3 py-2 text-decoration-none border-0 ${activeTab === 'preview' ? 'text-primary fw-medium border-bottom border-2 border-primary' : 'text-secondary'}`}
+                      className={`nav-link px-4 ${activeTab === 'preview' ? 'active' : ''}`}
                       onClick={() => setActiveTab('preview')}
                     >
+                      <i className="bi bi-image me-1"></i>
                       预览
                     </button>
                   </li>
                 </ul>
-              </div>
 
-              <div className="py-2" style={{ minHeight: '300px' }}>
-                {activeTab === 'summary' ? (
-                  <div>
-                    <p className="mb-4">{selectedArticle.summary}</p>
-
-                    {selectedArticle.images && selectedArticle.images.length > 0 && (
-                      <div className="mt-4">
-                        <h5 className="mb-3">网页图片</h5>
-                        <div className="row row-cols-2 row-cols-md-3 g-3">
-                          {selectedArticle.images.map((img, index) => (
-                            <div key={index} className="col">
-                              <img
-                                src={img}
-                                alt={`图片 ${index + 1}`}
-                                className="img-fluid rounded"
-                              />
-                            </div>
-                          ))}
-                        </div>
+                <div className="tab-content mt-3" style={{ minHeight: '300px' }}>
+                  {activeTab === 'summary' ? (
+                    <div className="tab-pane active fade-in">
+                      <div className="card border-0 shadow-sm p-4 mb-4">
+                        <p className="mb-3 lead">{selectedArticle.summary}</p>
                       </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <img
-                      src={selectedArticle.screenshot}
-                      alt="网页截图"
-                      className="img-fluid rounded shadow-sm"
-                      style={{ maxHeight: 'calc(100vh - 250px)' }}
-                    />
-                  </div>
-                )}
+
+                      {selectedArticle.images && selectedArticle.images.length > 0 && (
+                        <div className="mt-4 card border-0 shadow-sm p-4">
+                          <h5 className="mb-3 fw-medium"><i className="bi bi-images me-2"></i>网页图片</h5>
+                          <div className="row row-cols-2 row-cols-md-3 g-3">
+                            {selectedArticle.images.map((img, index) => (
+                              <div key={index} className="col">
+                                <img
+                                  src={img}
+                                  alt={`图片 ${index + 1}`}
+                                  className="img-fluid rounded shadow-sm"
+                                  style={{transition: 'transform 0.2s ease'}}
+                                  onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.03)'}
+                                  onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="tab-pane active">
+                      <div className="text-center fade-in">
+                        <div className="card border-0 shadow-sm p-2 mb-3">
+                          <img
+                            src={selectedArticle.screenshot}
+                            alt="网页截图"
+                            className="img-fluid rounded"
+                            style={{ maxHeight: 'calc(100vh - 250px)' }}
+                          />
+                        </div>
+                        <a href={selectedArticle.url} target="_blank" rel="noopener noreferrer" className="btn btn-primary mt-3">
+                          <i className="bi bi-globe me-1"></i>
+                          访问原网页
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ) : (
-            <div className="d-flex flex-column align-items-center justify-content-center h-100 text-center text-muted p-4">
-              <i className="bi bi-journal-bookmark display-4 mb-3"></i>
-              <h3 className="h5">没有选中的文章</h3>
-              <p>从左侧列表选择一篇文章，或者添加新的网页收藏</p>
-              <button
-                className="btn btn-primary mt-2"
-                onClick={() => setShowAddModal(true)}
-              >
-                <i className="bi bi-plus me-1"></i>
-                添加网页
-              </button>
+            <div className="empty-state">
+              <div className="card border-0 shadow-sm p-5 text-center" style={{maxWidth: '400px'}}>
+                <i className="bi bi-journal-bookmark display-4 mb-3 empty-state-icon"></i>
+                <h3 className="h5 mb-3">没有选中的文章</h3>
+                <p className="text-muted mb-4">从左侧列表选择一篇文章，或者添加新的网页收藏</p>
+                <button
+                  className="btn btn-primary mx-auto"
+                  style={{width: 'fit-content'}}
+                  onClick={() => setShowAddModal(true)}
+                >
+                  <i className="bi bi-plus-circle me-1"></i>
+                  添加网页
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -397,34 +453,42 @@ const Articles = () => {
 
       {/* 添加网页对话框 */}
       {showAddModal && (
-        <div className="modal d-block" tabIndex="-1" style={{backgroundColor: 'rgba(0,0,0,0.5)'}}>
+        <div className="modal d-block fade-in" tabIndex="-1" style={{backgroundColor: 'rgba(0,0,0,0.5)'}}>
           <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">添加网页</h5>
-                <button type="button" className="btn-close" onClick={() => setShowAddModal(false)}></button>
+            <div className="modal-content border-0 shadow-lg">
+              <div className="modal-header bg-primary text-white">
+                <h5 className="modal-title"><i className="bi bi-bookmark-plus me-2"></i>添加网页</h5>
+                <button type="button" className="btn-close btn-close-white" onClick={() => setShowAddModal(false)}></button>
               </div>
               <form onSubmit={handleAddArticle}>
-                <div className="modal-body">
+                <div className="modal-body p-4">
                   <div className="mb-3">
-                    <label htmlFor="newUrl" className="form-label">网页地址</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="newUrl"
-                      value={newUrl}
-                      onChange={(e) => setNewUrl(e.target.value)}
-                      placeholder="例如：https://example.com"
-                      disabled={isLoading}
-                    />
-                    {error && <div className="text-danger mt-2 small">{error}</div>}
+                    <label htmlFor="newUrl" className="form-label fw-medium">网页地址</label>
+                    <div className="input-group">
+                      <span className="input-group-text"><i className="bi bi-link-45deg"></i></span>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="newUrl"
+                        value={newUrl}
+                        onChange={(e) => setNewUrl(e.target.value)}
+                        placeholder="例如：https://example.com"
+                        disabled={isLoading}
+                        autoFocus
+                      />
+                    </div>
+                    {error && <div className="text-danger mt-2 small"><i className="bi bi-exclamation-triangle me-1"></i>{error}</div>}
+                    <div className="form-text mt-2">
+                      <i className="bi bi-info-circle me-1"></i>
+                      添加网页后，系统将自动提取网页内容并生成摘要
+                    </div>
                   </div>
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={() => setShowAddModal(false)}>取消</button>
+                  <button type="button" className="btn btn-outline-secondary" onClick={() => setShowAddModal(false)}>取消</button>
                   <button
                     type="submit"
-                    className="btn btn-primary"
+                    className="btn btn-primary px-4"
                     disabled={isLoading}
                   >
                     {isLoading ? (

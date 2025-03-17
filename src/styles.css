@@ -374,3 +374,70 @@ body.dark-mode .form-control:focus {
   background-color: #2d3748;
   color: #e0e0e0;
 }
+
+/* 季节颜色主题 */
+.bg-spring {
+  background-color: #84cc16;
+}
+
+.bg-summer {
+  background-color: #0ea5e9;
+}
+
+.bg-autumn {
+  background-color: #f97316;
+}
+
+.bg-winter {
+  background-color: #8b5cf6;
+}
+
+/* 卡片悬停效果 */
+.diary-list .card:hover,
+.article-list .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 用于显示在卡片中的日期和标签 */
+.badge.bg-light {
+  background-color: #f3f4f6 !important;
+  color: #4b5563;
+}
+
+/* 导航栏 */
+.nav-pills .nav-link {
+  border-radius: 0.5rem;
+  font-weight: 500;
+  color: var(--neutral-medium);
+}
+
+.nav-pills .nav-link:hover {
+  color: var(--primary);
+  background-color: var(--primary-soft);
+}
+
+.nav-pills .nav-link.active {
+  background-color: var(--primary);
+  color: white;
+}
+
+/* 更好的表单控件 */
+.form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.input-group-text {
+  color: var(--neutral-medium);
+}
+
+/* 页面过渡效果 */
+.tab-pane {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

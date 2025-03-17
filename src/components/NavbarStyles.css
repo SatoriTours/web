@@ -1,0 +1,50 @@
+/* 导航栏样式覆盖 */
+.navbar {
+  padding: 0.5rem 0;
+}
+
+/* 导航栏占据全浏览器宽度 */
+.navbar > .container-fluid {
+  padding-right: 1.5rem;
+  padding-left: 1.5rem;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+/* 确保在小屏幕上导航栏也有适当的边距 */
+@media (max-width: 768px) {
+  .navbar > .container-fluid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* 导航链接样式优化 */
+.navbar-nav .nav-link {
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+}
+
+/* 品牌图标和名称 */
+.navbar-brand {
+  font-size: 1.25rem;
+  padding-left: 0;
+}
+
+/* 改进在各种屏幕尺寸下的导航栏布局 */
+@media (min-width: 992px) {
+  .navbar-nav {
+    margin-left: 1rem;
+  }
+}
+
+/* 确保导航栏下拉菜单在移动设备上正确显示 */
+@media (max-width: 992px) {
+  .navbar-collapse {
+    padding-top: 0.5rem;
+  }
+
+  .navbar-nav {
+    margin-bottom: 0.5rem;
+  }
+}

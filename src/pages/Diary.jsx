@@ -17,7 +17,11 @@ const Diary = () => {
   const [editContent, setEditContent] = useState('');
   const [saveStatus, setSaveStatus] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(25); // 初始宽度25%
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    // 从localStorage获取保存的宽度，如果没有则使用默认值30%
+    const savedWidth = localStorage.getItem('sidebarWidth');
+    return savedWidth ? parseFloat(savedWidth) : 30;
+  });
   const [isResizing, setIsResizing] = useState(false);
   const [colorMode, setColorMode] = useState('light'); // 默认亮色模式
   const sidebarRef = useRef(null);
@@ -271,6 +275,9 @@ const Diary = () => {
   const handleMouseUp = () => {
     setIsResizing(false);
     document.body.classList.remove('resizing');
+
+    // 保存当前宽度到localStorage
+    localStorage.setItem('sidebarWidth', sidebarWidth.toString());
   };
 
   // 添加和移除全局事件监听器
@@ -285,24 +292,30 @@ const Diary = () => {
   }, [isResizing]);
 
   return (
-    <div ref={containerRef} className="container-fluid">
+    <div ref={containerRef} className="container-fluid bg-light">
       <div className="row" style={{height: 'calc(100vh - 56px)'}}>
         {/* 左侧列表 */}
         <div
           ref={sidebarRef}
-          className="p-0 border-end position-relative"
+          className="p-0 border-end position-relative shadow-sm"
           style={{
             height: '100%',
             overflow: 'auto',
             width: `${sidebarWidth}%`,
-            transition: isResizing ? 'none' : 'width 0.1s ease'
+            transition: isResizing ? 'none' : 'width 0.2s ease',
+            backgroundColor: 'white'
           }}
         >
           <div className="resizer" onMouseDown={handleMouseDown}></div>
-          <div className="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+          <div className="p-3 border-bottom d-flex justify-content-between align-items-center" style={{backgroundColor: 'var(--primary-50)'}}>
             <div className="d-flex align-items-center">
-              <i className="bi bi-journal-text text-primary me-2"></i>
-              <span className="fw-medium">日记 {entries.length}</span>
+              <div className="bg-primary bg-gradient rounded-circle p-2 me-2 text-white">
+                <i className="bi bi-journal-text"></i>
+              </div>
+              <div>
+                <h5 className="mb-0 fw-bold fs-6">我的日记</h5>
+                <small className="text-muted">{entries.length} 篇日记</small>
+              </div>
             </div>
             <div>
               <button
@@ -324,7 +337,22 @@ const Diary = () => {
                 onClick={handleCreateNewEntry}
               >
                 <i className="bi bi-plus"></i>
+                <span className="ms-1 d-none d-md-inline">新建</span>
               </button>
+            </div>
+          </div>
+
+          <div className="p-2">
+            <div className="input-group mb-3">
+              <span className="input-group-text bg-white border-end-0">
+                <i className="bi bi-search text-muted"></i>
+              </span>
+              <input
+                type="text"
+                className="form-control border-start-0"
+                placeholder="搜索日记..."
+                aria-label="搜索日记"
+              />
             </div>
           </div>
 
@@ -338,31 +366,37 @@ const Diary = () => {
           ) : entries.length === 0 ? (
             <div className="text-center py-5">
               <div className="py-5">
-                <i className="bi bi-journal-text display-1 text-secondary opacity-50"></i>
-                <p className="mt-3 text-muted">还没有日记，创建一篇吧！</p>
+                <div className="bg-light rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style={{width: '80px', height: '80px'}}>
+                  <i className="bi bi-journal-text display-4 text-primary opacity-75"></i>
+                </div>
+                <h5 className="mb-2">还没有日记</h5>
+                <p className="text-muted mb-4">记录你的思考、灵感和日常</p>
+                <button className="btn btn-primary" onClick={handleCreateNewEntry}>
+                  <i className="bi bi-plus me-1"></i>写新日记
+                </button>
               </div>
             </div>
           ) : (
-            <div className="list-group list-group-flush">
+            <div className="list-group list-group-flush fade-in">
               {entries.map((entry, index) => (
                 <div
                   key={entry.id || index}
-                  className={`list-group-item list-group-item-action border-0 border-bottom position-relative group ${selectedEntry && selectedEntry.id === entry.id ? 'active bg-light' : ''}`}
+                  className={`list-group-item list-group-item-action border-0 border-bottom position-relative ${selectedEntry && selectedEntry.id === entry.id ? 'active' : ''}`}
                   onClick={() => handleSelectEntry(entry)}
                 >
-                  <div className="d-flex justify-content-between align-items-start py-1">
+                  <div className="d-flex justify-content-between align-items-start py-2">
                     <div className="w-100 pe-2">
-                      <h6 className="mb-0 text-truncate">{entry.title}</h6>
-                      <p className="mb-0 small text-muted">
+                      <h6 className="mb-1 text-truncate fw-medium">{entry.title}</h6>
+                      <p className="mb-1 small text-muted">
                         <i className="bi bi-calendar2 me-1"></i>
                         {formatDate(entry.createdAt)}
                       </p>
-                      <p className="mb-0 small text-muted text-wrap overflow-hidden" style={{
+                      <p className="mb-0 small text-muted text-wrap overflow-hidden summary-text" style={{
                         display: '-webkit-box',
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
                         textOverflow: 'ellipsis',
-                        maxHeight: '2.5rem'
+                        lineHeight: '1.4'
                       }}>
                         {getEntrySummary(entry.content)}
                       </p>
@@ -372,10 +406,12 @@ const Diary = () => {
                         e.stopPropagation();
                         handleDeleteEntry(entry.id, e);
                       }}
-                      className="btn btn-sm text-danger border-0 flex-shrink-0 position-absolute end-0 top-0 mt-2 me-2 opacity-0 group-hover:opacity-100"
+                      className="btn btn-sm btn-outline-danger border-0 ms-auto rounded-circle p-0 d-flex align-items-center justify-content-center"
                       style={{
                         opacity: 0,
-                        transition: 'opacity 0.2s ease'
+                        transition: 'opacity 0.2s ease',
+                        width: '24px',
+                        height: '24px'
                       }}
                       onMouseOver={(e) => e.currentTarget.style.opacity = 1}
                       onMouseOut={(e) => e.currentTarget.style.opacity = 0}
@@ -391,52 +427,55 @@ const Diary = () => {
         </div>
 
         {/* 右侧详情 */}
-        <div className="p-0" style={{
+        <div className="p-0 bg-white" style={{
           height: '100%',
           overflow: 'auto',
           width: `${100 - sidebarWidth}%`,
-          transition: isResizing ? 'none' : 'width 0.1s ease'
+          transition: isResizing ? 'none' : 'width 0.2s ease'
         }}>
           {selectedEntry ? (
             <div className="p-4">
               {isEditing ? (
                 /* 编辑模式 */
-                <div>
-                  <div className="mb-3 d-flex justify-content-between align-items-center">
-                    <input
-                      type="text"
-                      className="form-control form-control-lg border-0 px-0 fw-bold"
-                      value={editTitle}
-                      onChange={(e) => setEditTitle(e.target.value)}
-                      placeholder="日记标题"
-                    />
-                    <div>
-                      {saveStatus && (
-                        <span className="badge bg-success me-2">{saveStatus}</span>
-                      )}
-                      <div className="btn-group">
-                        <button
-                          onClick={handleCancelEditing}
-                          className="btn btn-outline-secondary"
-                        >
-                          取消
-                        </button>
-                        <button
-                          onClick={handleSaveEntry}
-                          disabled={isSaving}
-                          className="btn btn-primary"
-                        >
-                          {isSaving ? '保存中...' : '保存'}
-                        </button>
+                <div className="slide-in-up">
+                  <div className="card border-0 shadow-sm p-3 mb-3">
+                    <div className="mb-3 d-flex justify-content-between align-items-center">
+                      <input
+                        type="text"
+                        className="form-control form-control-lg border-0 px-0 fw-bold"
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        placeholder="日记标题"
+                      />
+                      <div>
+                        {saveStatus && (
+                          <span className="badge bg-success me-2"><i className="bi bi-check-circle me-1"></i>{saveStatus}</span>
+                        )}
+                        <div className="btn-group">
+                          <button
+                            onClick={handleCancelEditing}
+                            className="btn btn-outline-secondary"
+                          >
+                            <i className="bi bi-x me-1"></i>取消
+                          </button>
+                          <button
+                            onClick={handleSaveEntry}
+                            disabled={isSaving}
+                            className="btn btn-primary"
+                          >
+                            {isSaving ? <><span className="spinner-border spinner-border-sm me-1"></span>保存中...</> : <><i className="bi bi-check me-1"></i>保存</>}
+                          </button>
+                        </div>
                       </div>
                     </div>
+                    <p className="text-muted small">
+                      <i className="bi bi-calendar-check me-1"></i>
+                      创建于 {formatDate(selectedEntry.createdAt)}
+                      {selectedEntry.createdAt !== selectedEntry.updatedAt &&
+                        <><i className="bi bi-pencil ms-2 me-1"></i>更新于 {formatDate(selectedEntry.updatedAt)}</>}
+                    </p>
                   </div>
-                  <p className="text-muted small">
-                    创建于 {formatDate(selectedEntry.createdAt)}
-                    {selectedEntry.createdAt !== selectedEntry.updatedAt &&
-                      ` · 更新于 ${formatDate(selectedEntry.updatedAt)}`}
-                  </p>
-                  <div data-color-mode={colorMode}>
+                  <div data-color-mode={colorMode} className="card border-0 shadow-sm p-2">
                     <MDEditor
                       value={editContent}
                       onChange={setEditContent}
@@ -448,13 +487,18 @@ const Diary = () => {
               ) : (
                 /* 查看模式 */
                 <div>
-                  <div className="mb-4 d-flex justify-content-between align-items-start">
+                  <div className="mb-4 d-flex justify-content-between align-items-start border-bottom pb-3">
                     <div>
-                      <h2 className="h3 mb-1">{selectedEntry.title}</h2>
+                      <h2 className="h3 mb-1 fw-bold">{selectedEntry.title || '无标题日记'}</h2>
                       <p className="text-muted small">
+                        <i className="bi bi-calendar3 me-1"></i>
                         创建于 {formatDate(selectedEntry.createdAt)}
                         {selectedEntry.createdAt !== selectedEntry.updatedAt &&
-                          ` · 更新于 ${formatDate(selectedEntry.updatedAt)}`}
+                          <span className="ms-2">
+                            <i className="bi bi-pencil me-1"></i>
+                            更新于 {formatDate(selectedEntry.updatedAt)}
+                          </span>
+                        }
                       </p>
                     </div>
                     <button
@@ -466,24 +510,27 @@ const Diary = () => {
                     </button>
                   </div>
                   <div
-                    className={`markdown-content py-2 ${colorMode === 'dark' ? 'text-light' : ''}`}
+                    className={`markdown-content py-2 rounded-3 ${colorMode === 'dark' ? 'text-light' : ''}`}
                     dangerouslySetInnerHTML={{ __html: marked(selectedEntry.content) }}
                   ></div>
                 </div>
               )}
             </div>
           ) : (
-            <div className="d-flex flex-column align-items-center justify-content-center h-100 text-center text-muted p-4">
-              <i className="bi bi-journal-text display-4 mb-3"></i>
-              <h3 className="h5">没有选中的日记</h3>
-              <p>从左侧列表选择一篇日记，或者创建新的日记</p>
-              <button
-                className="btn btn-primary mt-2"
-                onClick={handleCreateNewEntry}
-              >
-                <i className="bi bi-plus me-1"></i>
-                新建日记
-              </button>
+            <div className="empty-state">
+              <div className="card border-0 shadow-sm p-5 text-center" style={{maxWidth: '400px'}}>
+                <i className="bi bi-journal-text display-4 mb-3 empty-state-icon"></i>
+                <h3 className="h5 mb-3">没有选中的日记</h3>
+                <p className="text-muted mb-4">从左侧列表选择一篇日记，或者创建新的日记</p>
+                <button
+                  className="btn btn-primary mx-auto"
+                  style={{width: 'fit-content'}}
+                  onClick={handleCreateNewEntry}
+                >
+                  <i className="bi bi-plus-circle me-1"></i>
+                  新建日记
+                </button>
+              </div>
             </div>
           )}
         </div>
