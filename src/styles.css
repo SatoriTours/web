@@ -19,24 +19,289 @@
 
   --secondary: var(--bs-secondary);
   --secondary-strong: #5c636a;
+
+  --primary-color: #3a86ff;
+  --secondary-color: #ff006e;
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --card-bg: #ffffff;
+  --border-color: #e0e0e0;
+  --hover-bg: #f5f5f5;
+  --sidebar-bg: #f8f9fa;
+  --navbar-bg: #ffffff;
+  --input-bg: #ffffff;
+  --input-border: #ced4da;
+  --input-text: #212529;
+  --placeholder-color: #6c757d;
+  --modal-bg: #ffffff;
+  --sidebar-header-bg: #f8f9fa;
+  --article-bg: #ffffff;
+  --article-title-bg: #ffffff;
+  --article-preview-bg: #ffffff;
+}
+
+body.dark-mode {
+  --primary-color: #61a0ff;
+  --secondary-color: #ff4d94;
+  --bg-color: #121212;
+  --text-color: #e0e0e0;
+  --card-bg: #1e1e1e;
+  --border-color: #333333;
+  --hover-bg: #2a2a2a;
+  --sidebar-bg: #1a1a1a;
+  --navbar-bg: #1a1a1a;
+  --input-bg: #2a2a2a;
+  --input-border: #444444;
+  --input-text: #e0e0e0;
+  --placeholder-color: #909090;
+  --modal-bg: #1e1e1e;
+  --sidebar-header-bg: #1a1a1a;
+  --article-bg: #1e1e1e;
+  --article-title-bg: #1e1e1e;
+  --article-preview-bg: #1e1e1e;
 }
 
 body {
-  background-color: var(--neutral-faint);
-  color: var(--neutral-intense);
+  background-color: var(--bg-color);
+  color: var(--text-color);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* 登录页面暗黑模式 - 修复placeholder颜色 */
+body.dark-mode .form-control::placeholder {
+  color: var(--placeholder-color);
+  opacity: 1;
+}
+
+body.dark-mode .input-group-text {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--placeholder-color);
+}
+
+/* 收藏页和日记页面的搜索栏和侧边栏区域背景 */
+body.dark-mode .sticky-top.bg-white {
+  background-color: var(--sidebar-header-bg) !important;
+}
+
+body.dark-mode .sticky-top .input-group-text.bg-white {
+  background-color: var(--input-bg) !important;
+}
+
+/* 修复收藏页和日记页面的背景色 */
+body.dark-mode .container-fluid,
+body.dark-mode .container-fluid.p-0,
+body.dark-mode .container-fluid.bg-light {
+  background-color: var(--bg-color) !important;
+}
+
+/* 确保文章列表和预览区域背景色 */
+body.dark-mode .flex-grow-1 {
+  background-color: var(--article-bg);
+}
+
+body.dark-mode .flex-grow-1 h2,
+body.dark-mode .flex-grow-1 h5,
+body.dark-mode .flex-grow-1 .card-title {
+  color: var(--text-color);
+}
+
+/* 修复文章页面的视图区域背景 */
+body.dark-mode iframe {
+  background-color: #fff;
+}
+
+/* 修复文章页面的预览区域背景 */
+body.dark-mode .card.border-0.shadow-sm {
+  background-color: var(--card-bg) !important;
+}
+
+/* 修复空白状态区域背景 */
+body.dark-mode .bg-light.rounded-circle {
+  background-color: var(--card-bg) !important;
+}
+
+/* 修复模态框背景 */
+body.dark-mode .modal-content {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+/* 修复表单中其他组件的背景 */
+body.dark-mode .bg-white {
+  background-color: var(--card-bg) !important;
+}
+
+/* 修复图标颜色 */
+body.dark-mode .text-muted .bi {
+  color: var(--placeholder-color) !important;
+}
+
+/* 日记富文本编辑器按钮和标题样式修复 */
+body.dark-mode .w-md-editor-toolbar button {
+  color: var(--text-color) !important;
+}
+
+body.dark-mode .w-md-editor-toolbar button svg {
+  fill: var(--text-color) !important;
+}
+
+body.dark-mode .w-md-editor-text textarea {
+  color: var(--text-color) !important;
+}
+
+body.dark-mode .w-md-editor-text-pre > code,
+body.dark-mode .w-md-editor-text-input {
+  color: var(--text-color) !important;
+}
+
+/* 修复Markdown编辑器的语法高亮 */
+body.dark-mode .w-md-editor-text-pre .token.title,
+body.dark-mode .w-md-editor-text-pre .token.title.important,
+body.dark-mode .w-md-editor-text-pre .token.title.class_,
+body.dark-mode .w-md-editor-text-pre h1,
+body.dark-mode .w-md-editor-text-pre h2,
+body.dark-mode .w-md-editor-text-pre h3,
+body.dark-mode .w-md-editor-text-pre h4,
+body.dark-mode .w-md-editor-text-pre h5,
+body.dark-mode .w-md-editor-text-pre h6 {
+  color: #bd93f9 !important;
+}
+
+body.dark-mode .w-md-editor-text-pre .token.keyword,
+body.dark-mode .w-md-editor-text-pre .token.operator {
+  color: #ff79c6 !important;
+}
+
+body.dark-mode .w-md-editor-text-pre .token.string,
+body.dark-mode .w-md-editor-text-pre .token.attr-value {
+  color: #f1fa8c !important;
+}
+
+body.dark-mode .w-md-editor-text-pre .token.punctuation {
+  color: #c0c0c0 !important;
+}
+
+body.dark-mode .w-md-editor-text-pre .token.comment {
+  color: #6272a4 !important;
+}
+
+body.dark-mode .w-md-editor-text-pre .token.tag,
+body.dark-mode .w-md-editor-text-pre .token.constant {
+  color: #8be9fd !important;
+}
+
+body.dark-mode .w-md-editor-toolbar {
+  background-color: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+body.dark-mode .wmde-markdown h1,
+body.dark-mode .wmde-markdown h2,
+body.dark-mode .wmde-markdown h3,
+body.dark-mode .wmde-markdown h4,
+body.dark-mode .wmde-markdown h5,
+body.dark-mode .wmde-markdown h6,
+body.dark-mode .wmde-markdown-color code[class*="language-"],
+body.dark-mode .wmde-markdown-color pre[class*="language-"] {
+  color: var(--text-color) !important;
+}
+
+body.dark-mode .wmde-markdown-color code[class*="language-"],
+body.dark-mode .wmde-markdown-color pre[class*="language-"] {
+  text-shadow: none !important;
+  background: #2a2a2a !important;
+}
+
+body.dark-mode .w-md-editor-preview {
+  background-color: var(--card-bg) !important;
+}
+
+/* 导航栏暗黑模式 */
+body.dark-mode .navbar {
+  background-color: var(--navbar-bg) !important;
+  border-bottom: 1px solid var(--border-color);
+}
+
+body.dark-mode .navbar-light .navbar-brand,
+body.dark-mode .navbar-light .nav-link {
+  color: var(--text-color);
+}
+
+body.dark-mode .navbar-light .navbar-toggler-icon {
+  filter: invert(0.8);
+}
+
+/* 表单暗黑模式 */
+body.dark-mode .form-control,
+body.dark-mode .input-group-text {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--input-text);
+}
+
+body.dark-mode .form-control:focus {
+  background-color: var(--input-bg);
+  color: var(--input-text);
+}
+
+/* 按钮暗黑模式 */
+body.dark-mode .btn-outline-secondary {
+  color: #adb5bd;
+  border-color: #6c757d;
+}
+
+body.dark-mode .btn-outline-secondary:hover {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+}
+
+body.dark-mode .btn-outline-danger {
+  color: #ff6b6b;
+  border-color: #dc3545;
+}
+
+/* 列表项暗黑模式 */
+body.dark-mode .list-group-item {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+body.dark-mode .list-group-item-action:hover {
+  background-color: var(--hover-bg);
+}
+
+body.dark-mode .list-group-item-action.active {
+  background-color: rgba(79, 70, 229, 0.2);
+  border-left-color: var(--primary-color);
+  color: var(--text-color);
 }
 
 /* 定制卡片阴影效果 */
 .card {
-  transition: none !important;
-  border: 1px solid transparent !important;
+  transition: background-color 0.3s, border-color 0.3s;
+  border: 1px solid var(--border-color) !important;
   margin: 0.5rem 0 !important;
+  background-color: var(--card-bg);
+  color: var(--text-color);
 }
 
 .card:hover {
   transform: none !important;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+body.dark-mode .card {
+  background-color: var(--card-bg);
+  border-color: var(--border-color) !important;
+}
+
+body.dark-mode .card-body,
+body.dark-mode .card-header {
+  color: var(--text-color);
 }
 
 /* 拖拽分隔线样式 */
@@ -57,6 +322,11 @@ body {
   background-color: rgba(0, 0, 0, 0.05);
 }
 
+body.dark-mode .resizer:hover,
+body.dark-mode .resizing .resizer {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 .resizing {
   cursor: col-resize;
   user-select: none;
@@ -67,28 +337,55 @@ body {
   pointer-events: none;
 }
 
-/* 左右布局的滚动条样式 */
-div[style*="overflow: auto"] {
-  scrollbar-width: thin;
-  scrollbar-color: var(--neutral-muted) transparent;
+/* Markdown编辑器暗黑模式 */
+body.dark-mode .w-md-editor,
+body.dark-mode .w-md-editor-text,
+body.dark-mode .w-md-editor-toolbar,
+body.dark-mode .w-md-editor-preview {
+  background-color: var(--card-bg);
+  color: var(--text-color);
 }
 
-div[style*="overflow: auto"]::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+body.dark-mode .w-md-editor-text textarea {
+  color: var(--text-color);
 }
 
-div[style*="overflow: auto"]::-webkit-scrollbar-track {
-  background: transparent;
+/* 主题切换选项样式 */
+.theme-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
-div[style*="overflow: auto"]::-webkit-scrollbar-thumb {
-  background-color: var(--neutral-muted);
-  border-radius: 3px;
+.theme-option {
+  flex: 1 1 200px;
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-div[style*="overflow: auto"]::-webkit-scrollbar-thumb:hover {
-  background-color: var(--neutral-medium);
+.theme-option:hover {
+  border-color: var(--primary-color);
+  background-color: var(--hover-bg);
+}
+
+body.dark-mode .theme-option {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+body.dark-mode .theme-option:hover {
+  background-color: var(--hover-bg);
+}
+
+.theme-icon {
+  margin-right: 15px;
+  font-size: 1.5rem;
+  color: var(--primary-color);
 }
 
 /* 导航链接样式 */
@@ -500,4 +797,174 @@ div[data-color-mode] {
 /* 确保卡片主体不受影响 */
 .card-body {
   padding: 1rem !important;
+}
+
+/* 修复Articles页面的暗黑模式问题 */
+body.dark-mode .sticky-top,
+body.dark-mode .sticky-top.bg-white,
+body.dark-mode [style*="background-color: white"],
+body.dark-mode [style*="backgroundColor: white"],
+body.dark-mode .bg-white {
+  background-color: var(--card-bg) !important;
+}
+
+/* 修复Articles页面的内联样式 - 使用更强的选择器 */
+body.dark-mode div[style*="background-color: white"],
+body.dark-mode div[style*="backgroundColor: white"],
+body.dark-mode div[style*="background: white"],
+body.dark-mode span[style*="background-color: white"],
+body.dark-mode p[style*="background-color: white"] {
+  background-color: var(--card-bg) !important;
+}
+
+/* 修复Articles页面搜索区域和头部的内联样式 */
+body.dark-mode .sticky-top[style],
+body.dark-mode .sticky-top .p-3.border-bottom[style],
+body.dark-mode .sticky-top .p-2[style] {
+  background-color: var(--card-bg) !important;
+}
+
+/* 修复Articles页面左侧栏的标题区域 */
+body.dark-mode .border-bottom {
+  border-color: var(--border-color) !important;
+}
+
+/* 修复Articles页面的"已收藏"区域 */
+body.dark-mode h5,
+body.dark-mode h6,
+body.dark-mode .fw-bold {
+  color: var(--text-color);
+}
+
+/* 修复搜索栏背景色问题 */
+body.dark-mode .input-group .form-control,
+body.dark-mode .input-group .input-group-text {
+  background-color: var(--input-bg) !important;
+  border-color: var(--input-border) !important;
+  color: var(--input-text) !important;
+}
+
+/* 修复输入框搜索图标背景 */
+body.dark-mode .input-group-text.bg-white {
+  background-color: var(--input-bg) !important;
+  color: var(--placeholder-color) !important;
+}
+
+/* Articles页面特定选择器 */
+body.dark-mode .d-flex.justify-content-between.p-3.border-bottom,
+body.dark-mode .p-2,
+body.dark-mode .p-3.border-bottom,
+body.dark-mode div[class*="overflow-auto"],
+body.dark-mode div[style*="overflow: auto"] {
+  background-color: var(--card-bg) !important;
+}
+
+/* 确保所有Bg-white的区域在暗黑模式下有正确的背景色 */
+body.dark-mode .position-relative,
+body.dark-mode .d-flex,
+body.dark-mode .container-fluid,
+body.dark-mode .row,
+body.dark-mode .col,
+body.dark-mode .col-md-4,
+body.dark-mode .col-md-8,
+body.dark-mode .p-0 {
+  background-color: var(--bg-color);
+}
+
+/* 修复收藏页面的特定元素 */
+body.dark-mode [class*="sidebar"],
+body.dark-mode [class*="articles-list"],
+body.dark-mode [class*="article-detail"] {
+  background-color: var(--card-bg) !important;
+}
+
+/* 确保左侧边栏和右侧内容区域的背景色正确 */
+body.dark-mode .container-fluid > div {
+  background-color: var(--bg-color);
+}
+
+body.dark-mode .container-fluid > div > div {
+  background-color: var(--card-bg);
+}
+
+/* 修复内联样式的背景色 */
+body.dark-mode [style*="background"],
+body.dark-mode [style*="background-color"] {
+  background-color: var(--card-bg) !important;
+}
+
+/* Articles页面的左侧栏、搜索区域和导航完全覆盖 */
+body.dark-mode [class*="sidebar"] > div,
+body.dark-mode [class*="sidebar"] > span,
+body.dark-mode [class*="sidebar"] > p,
+body.dark-mode [class*="articles-list"] > div,
+body.dark-mode [class*="articles-list"] > span,
+body.dark-mode .overflow-auto > div,
+body.dark-mode .overflow-hidden > div,
+body.dark-mode .border-end,
+body.dark-mode .border-start,
+body.dark-mode .border,
+body.dark-mode .d-flex.justify-content-between,
+body.dark-mode .input-group {
+  background-color: var(--card-bg) !important;
+}
+
+/* 修复背景为白色的内联样式元素 */
+body.dark-mode [style*="background-color: white"],
+body.dark-mode [style*="backgroundColor: white"],
+body.dark-mode [style*="background: white"],
+body.dark-mode [style*="backgroundColor: 'white'"],
+body.dark-mode [style*="backgroundColor='white'"] {
+  background-color: var(--card-bg) !important;
+}
+
+/* 修复搜索区域背景和图标 */
+body.dark-mode .input-group,
+body.dark-mode .input-group-text {
+  background-color: var(--input-bg) !important;
+  border-color: var(--input-border) !important;
+}
+
+body.dark-mode .input-group .input-group-text i,
+body.dark-mode .input-group .input-group-text span {
+  color: var(--placeholder-color) !important;
+}
+
+/* 修复收藏页面的空白提示区域背景 */
+body.dark-mode .text-center.py-5,
+body.dark-mode .empty-state,
+body.dark-mode .py-5 {
+  background-color: var(--card-bg) !important;
+}
+
+/* 修复暗黑模式下的模态框背景 */
+body.dark-mode .modal,
+body.dark-mode .modal-dialog,
+body.dark-mode .modal-content,
+body.dark-mode .modal-header,
+body.dark-mode .modal-body,
+body.dark-mode .modal-footer {
+  background-color: var(--modal-bg) !important;
+  color: var(--text-color) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* 强制应用暗黑模式背景到特定元素 */
+body.dark-mode .sticky-top,
+body.dark-mode .sticky-top > div,
+body.dark-mode .border-bottom,
+body.dark-mode .p-3.border-bottom,
+body.dark-mode .p-2,
+body.dark-mode .input-group-text,
+body.dark-mode .input-group-text.bg-white {
+  background-color: var(--card-bg) !important;
+}
+
+/* 特殊处理border-bottom元素的背景 */
+body.dark-mode .border-bottom {
+  border-color: var(--border-color) !important;
+}
+
+body.dark-mode div.sticky-top.bg-white {
+  background-color: var(--card-bg) !important;
 }

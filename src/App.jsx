@@ -3,8 +3,10 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Login from './pages/Login.jsx';
 import Articles from './pages/Articles.jsx';
 import Diary from './pages/Diary.jsx';
+import Settings from './pages/Settings.jsx';
 import Navbar from './components/Navbar.jsx';
 import TestHeroicons from './components/TestHeroicons.jsx';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -71,7 +73,7 @@ const App = () => {
   };
 
   return (
-    <>
+    <ThemeProvider>
       {isAuthenticated && <Navbar onLogout={handleLogout} />}
       <Routes>
         <Route path="/login" element={<Login onLogin={handleLogin} isAuthenticated={isAuthenticated} />} />
@@ -116,9 +118,17 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </>
+    </ThemeProvider>
   );
 };
 

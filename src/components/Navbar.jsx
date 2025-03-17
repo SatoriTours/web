@@ -47,6 +47,19 @@ const Navbar = ({ onLogout }) => {
                 日记
               </NavLink>
             </li>
+            <li className="nav-item mx-1">
+              <NavLink
+                to="/settings"
+                className={({ isActive }) =>
+                  isActive
+                    ? "nav-link active fw-medium"
+                    : "nav-link"
+                }
+              >
+                <i className="bi bi-gear me-1"></i>
+                设置
+              </NavLink>
+            </li>
           </ul>
 
           <div className="d-flex">
