@@ -989,20 +989,15 @@ body.dark-mode .bg-light {
 /* 修复暗黑模式下"摘要"、"预览"按钮下的白线 */
 body.dark-mode .nav-tabs,
 body.dark-mode .nav {
-  border-bottom-color: var(--border-color) !important;
+  border-bottom: none !important;
 }
 
 body.dark-mode .nav-tabs .nav-link.active,
 body.dark-mode .nav-tabs .nav-item.show .nav-link {
-  color: var(--text-color);
-  background-color: var(--card-bg);
-  border-color: var(--border-color) var(--border-color) var(--card-bg);
-}
-
-body.dark-mode .nav-tabs .nav-link:hover,
-body.dark-mode .nav-tabs .nav-link:focus {
-  border-color: var(--border-color);
-  background-color: var(--hover-bg);
+  color: #f0f0f0 !important;
+  background-color: rgba(66, 99, 145, 0.8) !important;
+  border: 1px solid rgba(66, 99, 145, 0.9) !important;
+  border-radius: 0.375rem !important;
 }
 
 /* 优化左侧边栏选中区域样式 */
@@ -1198,33 +1193,42 @@ body.dark-mode .list-group-item-action h6 {
 
 /* 优化"摘要"、"预览"、"访问原网页"等按钮样式 */
 body.dark-mode .nav-tabs {
-  border-bottom-color: var(--border-color) !important;
+  border-bottom: none !important;
+  padding: 1rem 1rem 0 1rem !important;
+  display: flex !important;
+  gap: 0.5rem !important;
   background-color: transparent !important;
 }
 
 body.dark-mode .nav-tabs .nav-link {
-  color: #909090 !important;
+  color: #e0e0e0 !important;
   background-color: transparent !important;
-  border: 1px solid transparent !important;
-  border-bottom: none !important;
+  border: 1px solid var(--border-color) !important;
   padding: 0.5rem 1rem !important;
-  margin-right: 0.5rem !important;
-  border-radius: 0.375rem 0.375rem 0 0 !important;
+  border-radius: 0.375rem !important;
   transition: all 0.2s ease !important;
+  font-weight: 500 !important;
 }
 
 body.dark-mode .nav-tabs .nav-link:hover {
+  background-color: rgba(97, 160, 255, 0.1) !important;
+  border-color: var(--primary-color) !important;
   color: var(--primary-color) !important;
-  background-color: rgba(97, 160, 255, 0.05) !important;
-  border-color: var(--border-color) !important;
 }
 
 body.dark-mode .nav-tabs .nav-link.active {
-  color: var(--primary-color) !important;
-  background-color: var(--bg-level-2) !important;
-  border-color: var(--border-color) !important;
-  border-bottom-color: var(--bg-level-2) !important;
-  font-weight: 500 !important;
+  color: #f0f0f0 !important;
+  background-color: rgba(66, 99, 145, 0.8) !important;
+  border-color: rgba(66, 99, 145, 0.9) !important;
+  opacity: 1 !important;
+  border-bottom: 1px solid rgba(66, 99, 145, 0.9) !important;
+}
+
+body.dark-mode .nav-pills .nav-link.active {
+  color: #f0f0f0 !important;
+  background-color: rgba(66, 99, 145, 0.8) !important;
+  border-color: rgba(66, 99, 145, 0.9) !important;
+  opacity: 1 !important;
 }
 
 /* 统一"访问原网页"按钮样式 */
@@ -1420,6 +1424,7 @@ body.dark-mode .nav-tabs .nav-link.active {
   background-color: rgba(66, 99, 145, 0.8) !important;
   border-color: rgba(66, 99, 145, 0.9) !important;
   opacity: 1 !important;
+  border-bottom: 1px solid rgba(66, 99, 145, 0.9) !important;
 }
 
 body.dark-mode .nav-pills .nav-link.active {
@@ -1517,4 +1522,21 @@ body.dark-mode .tab-content > .tab-pane > div {
   padding: 0 !important;
   margin: 0 !important;
   border: none !important;
+}
+
+/* 确保退出按钮文字不会换行 */
+body.dark-mode .btn-outline-secondary,
+.btn-outline-secondary {
+  white-space: nowrap !important;
+  min-width: 70px !important;
+}
+
+/* 导航栏按钮文字不换行 */
+.navbar .btn,
+body.dark-mode .navbar .btn {
+  white-space: nowrap !important;
+  min-width: 70px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
