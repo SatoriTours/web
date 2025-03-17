@@ -1380,3 +1380,141 @@ body.dark-mode .p-4 {
   border-color: var(--border-color) !important;
   background-color: var(--bg-level-2) !important;
 }
+
+/* 1. 去除"已收藏"文字的黑色背景 */
+body.dark-mode .fw-bold,
+body.dark-mode h5.mb-0.fw-bold,
+body.dark-mode .d-flex.justify-content-between.p-3.border-bottom h5,
+body.dark-mode .d-flex.justify-content-between * {
+  background-color: transparent !important;
+  color: var(--text-color) !important;
+}
+
+/* 2. 统一"摘要"、"预览"按钮与"访问原网页"按钮的颜色 */
+body.dark-mode .nav-tabs {
+  border-bottom: none !important;
+  padding: 1rem 1rem 0 1rem !important;
+  display: flex !important;
+  gap: 0.5rem !important;
+  background-color: transparent !important;
+}
+
+body.dark-mode .nav-tabs .nav-link {
+  color: #e0e0e0 !important;
+  background-color: transparent !important;
+  border: 1px solid var(--border-color) !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 0.375rem !important;
+  transition: all 0.2s ease !important;
+  font-weight: 500 !important;
+}
+
+body.dark-mode .nav-tabs .nav-link:hover {
+  background-color: rgba(97, 160, 255, 0.1) !important;
+  border-color: var(--primary-color) !important;
+  color: var(--primary-color) !important;
+}
+
+body.dark-mode .nav-tabs .nav-link.active {
+  color: #f0f0f0 !important;
+  background-color: rgba(66, 99, 145, 0.8) !important;
+  border-color: rgba(66, 99, 145, 0.9) !important;
+  opacity: 1 !important;
+}
+
+body.dark-mode .nav-pills .nav-link.active {
+  color: #f0f0f0 !important;
+  background-color: rgba(66, 99, 145, 0.8) !important;
+  border-color: rgba(66, 99, 145, 0.9) !important;
+  opacity: 1 !important;
+}
+
+/* 3. 优化添加按钮和刷新按钮样式 - 统一大小和样式 */
+body.dark-mode .btn-primary.btn-lg,
+body.dark-mode .btn-outline-primary.btn-lg,
+body.dark-mode .btn-primary,
+body.dark-mode .btn-outline-secondary.btn-sm,
+body.dark-mode .btn-sm.btn-primary,
+body.dark-mode .btn-sm.btn-outline-secondary {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.875rem !important;
+  background-color: transparent !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-color) !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+  height: 30px !important;
+  width: 30px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body.dark-mode .btn-primary.btn-lg:hover,
+body.dark-mode .btn-outline-primary.btn-lg:hover,
+body.dark-mode .btn-primary:hover,
+body.dark-mode .btn-outline-secondary.btn-sm:hover,
+body.dark-mode .btn-sm.btn-primary:hover,
+body.dark-mode .btn-sm.btn-outline-secondary:hover {
+  background-color: var(--hover-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* 去掉"新建"文字，只保留图标 */
+body.dark-mode .btn-primary.btn-lg span:not(.visually-hidden),
+body.dark-mode .btn-outline-primary.btn-lg span:not(.visually-hidden),
+body.dark-mode .btn-primary span:not(.visually-hidden),
+body.dark-mode .btn-sm.btn-primary span:not(.visually-hidden) {
+  display: none !important;
+}
+
+/* 美化刷新按钮 */
+body.dark-mode .btn-outline-secondary.btn-sm {
+  padding: 0.25rem 0.5rem !important;
+  background-color: transparent !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-color) !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+/* 4. 简化articles页面内容层次，让tab-content直接显示内容 */
+body.dark-mode .tab-content > .tab-pane {
+  display: block !important;
+  opacity: 1 !important;
+  height: auto !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+body.dark-mode .tab-content {
+  padding: 1.5rem !important;
+  background-color: var(--bg-level-2) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 0.375rem !important;
+  margin-top: 0.5rem !important;
+}
+
+/* 修复tab-content的层次过多问题，统一背景色 */
+body.dark-mode .tab-content > * > * {
+  background-color: transparent !important;
+}
+
+body.dark-mode .tab-content p,
+body.dark-mode .tab-content div,
+body.dark-mode .tab-content span,
+body.dark-mode .tab-content h1,
+body.dark-mode .tab-content h2,
+body.dark-mode .tab-content h3,
+body.dark-mode .tab-content h4,
+body.dark-mode .tab-content h5,
+body.dark-mode .tab-content h6 {
+  background-color: transparent !important;
+}
+
+/* 确保tab-content直接子元素没有额外的边距和填充 */
+body.dark-mode .tab-content > .tab-pane > div {
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+}

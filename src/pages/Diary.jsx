@@ -317,9 +317,9 @@ const Diary = () => {
               <button
                 className="btn btn-sm btn-primary"
                 onClick={handleCreateNewEntry}
+                title="新建日记"
               >
                 <i className="bi bi-plus"></i>
-                <span className="ms-1 d-none d-md-inline">新建</span>
               </button>
             </div>
           </div>
