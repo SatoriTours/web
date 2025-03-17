@@ -968,3 +968,415 @@ body.dark-mode .border-bottom {
 body.dark-mode div.sticky-top.bg-white {
   background-color: var(--card-bg) !important;
 }
+
+/* 统一暗黑模式下的背景色 */
+body.dark-mode .navbar,
+body.dark-mode .navbar-collapse,
+body.dark-mode .navbar-brand,
+body.dark-mode .list-group-item,
+body.dark-mode .list-group-item-action,
+body.dark-mode .dropdown-menu,
+body.dark-mode .card,
+body.dark-mode .sticky-top,
+body.dark-mode [class*="sidebar"],
+body.dark-mode [class*="articles-list"],
+body.dark-mode .bg-white,
+body.dark-mode .bg-light {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* 修复暗黑模式下"摘要"、"预览"按钮下的白线 */
+body.dark-mode .nav-tabs,
+body.dark-mode .nav {
+  border-bottom-color: var(--border-color) !important;
+}
+
+body.dark-mode .nav-tabs .nav-link.active,
+body.dark-mode .nav-tabs .nav-item.show .nav-link {
+  color: var(--text-color);
+  background-color: var(--card-bg);
+  border-color: var(--border-color) var(--border-color) var(--card-bg);
+}
+
+body.dark-mode .nav-tabs .nav-link:hover,
+body.dark-mode .nav-tabs .nav-link:focus {
+  border-color: var(--border-color);
+  background-color: var(--hover-bg);
+}
+
+/* 优化左侧边栏选中区域样式 */
+body.dark-mode .list-group-item-action.active {
+  background-color: rgba(79, 70, 229, 0.1) !important;
+  border-left: 3px solid var(--primary-color) !important;
+  border-color: var(--border-color) !important;
+  border-left-color: var(--primary-color) !important;
+  color: var(--text-color) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+body.dark-mode .list-group-item-action {
+  border-left: 3px solid transparent !important;
+  transition: background-color 0.2s ease-in-out, border-left-color 0.2s ease-in-out !important;
+}
+
+body.dark-mode .list-group-item-action:hover {
+  background-color: var(--hover-bg) !important;
+  border-color: var(--border-color) !important;
+  border-left-color: var(--primary-color) !important;
+  border-left-width: 3px !important;
+  opacity: 0.9;
+}
+
+/* 修复收藏和日记页面左侧栏选中效果 */
+body.dark-mode .list-group-item-action.active::after {
+  display: none;
+}
+
+/* 修复侧边栏子项目边框问题 */
+body.dark-mode .border,
+body.dark-mode .border-start,
+body.dark-mode .border-end,
+body.dark-mode .border-top,
+body.dark-mode .border-bottom {
+  border-color: var(--border-color) !important;
+}
+
+/* 确保侧边栏子元素背景色与父元素一致 */
+body.dark-mode [class*="sidebar"] * {
+  background-color: transparent;
+}
+
+/* 确保暗黑模式下统一的容器背景色 */
+body.dark-mode,
+body.dark-mode .container-fluid,
+body.dark-mode .container,
+body.dark-mode .row,
+body.dark-mode .col,
+body.dark-mode .col-md-4,
+body.dark-mode .col-md-8 {
+  background-color: var(--bg-color) !important;
+}
+
+/* 修复导航栏区域的样式 */
+body.dark-mode .navbar-light .navbar-brand,
+body.dark-mode .navbar-light .nav-link {
+  color: var(--text-color) !important;
+}
+
+body.dark-mode .navbar-light .nav-link:hover,
+body.dark-mode .navbar-light .nav-link:focus,
+body.dark-mode .navbar-light .nav-link.active {
+  color: var(--primary-color) !important;
+}
+
+/* 确保表格区域样式一致 */
+body.dark-mode table,
+body.dark-mode thead,
+body.dark-mode tbody,
+body.dark-mode tr,
+body.dark-mode td,
+body.dark-mode th {
+  background-color: var(--card-bg) !important;
+  color: var(--text-color) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* 修复摘要/预览标签页样式 */
+body.dark-mode .nav-tabs .nav-link {
+  color: var(--text-color);
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+}
+
+body.dark-mode .nav-tabs .nav-link.active {
+  color: var(--primary-color);
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+  border-bottom-color: var(--card-bg);
+}
+
+/* 统一应用嵌套级别较高的背景色 */
+body.dark-mode {
+  --bg-level-1: #121212; /* 最底层背景 */
+  --bg-level-2: #1e1e1e; /* 卡片、面板背景 */
+  --bg-level-3: #252525; /* 输入框、悬停背景 */
+}
+
+body.dark-mode {
+  background-color: var(--bg-level-1) !important;
+}
+
+body.dark-mode .container-fluid,
+body.dark-mode .container,
+body.dark-mode .row {
+  background-color: var(--bg-level-1) !important;
+}
+
+body.dark-mode .card,
+body.dark-mode .list-group-item,
+body.dark-mode .navbar,
+body.dark-mode .sticky-top,
+body.dark-mode .modal-content,
+body.dark-mode .dropdown-menu,
+body.dark-mode [class*="sidebar"] {
+  background-color: var(--bg-level-2) !important;
+}
+
+body.dark-mode .form-control,
+body.dark-mode .input-group-text,
+body.dark-mode .list-group-item-action:hover,
+body.dark-mode .btn-outline-secondary:hover {
+  background-color: var(--bg-level-3) !important;
+}
+
+/* 修复sidebar内的选中项背景色 */
+body.dark-mode .list-group-item-action.active {
+  background-color: rgba(79, 70, 229, 0.15) !important;
+  border-left: 3px solid var(--primary-color) !important;
+  color: var(--primary-color) !important;
+}
+
+/* 确保所有文本颜色一致 */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6,
+body.dark-mode p,
+body.dark-mode span:not(.badge),
+body.dark-mode div,
+body.dark-mode a:not(.btn) {
+  color: var(--text-color) !important;
+}
+
+body.dark-mode .text-muted {
+  color: #909090 !important;
+}
+
+body.dark-mode a:not(.btn),
+body.dark-mode .nav-link.active,
+body.dark-mode .navbar-light .nav-link.active {
+  color: var(--primary-color) !important;
+}
+
+/* 统一收藏页面左侧栏文章项样式 */
+body.dark-mode .list-group-item,
+body.dark-mode .list-group-item-action {
+  background-color: var(--bg-level-2) !important;
+  border-color: var(--border-color) !important;
+  border-left: 3px solid transparent !important;
+  margin: 0 !important;
+  padding: 0.75rem 1rem !important;
+  transition: all 0.2s ease !important;
+}
+
+body.dark-mode .list-group-item-action:hover {
+  background-color: var(--bg-level-3) !important;
+  border-left-color: rgba(97, 160, 255, 0.5) !important;
+}
+
+body.dark-mode .list-group-item-action.active {
+  background-color: rgba(97, 160, 255, 0.1) !important;
+  border-left-color: var(--primary-color) !important;
+  color: var(--primary-color) !important;
+}
+
+/* 去除收藏页面文章项的多层嵌套背景色 */
+body.dark-mode .list-group-item-action .d-flex,
+body.dark-mode .list-group-item-action .flex-shrink-0,
+body.dark-mode .list-group-item-action .flex-grow-1,
+body.dark-mode .list-group-item-action .overflow-hidden,
+body.dark-mode .list-group-item-action div,
+body.dark-mode .list-group-item-action p,
+body.dark-mode .list-group-item-action h6 {
+  background-color: transparent !important;
+}
+
+/* 优化"摘要"、"预览"、"访问原网页"等按钮样式 */
+body.dark-mode .nav-tabs {
+  border-bottom-color: var(--border-color) !important;
+  background-color: transparent !important;
+}
+
+body.dark-mode .nav-tabs .nav-link {
+  color: #909090 !important;
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+  border-bottom: none !important;
+  padding: 0.5rem 1rem !important;
+  margin-right: 0.5rem !important;
+  border-radius: 0.375rem 0.375rem 0 0 !important;
+  transition: all 0.2s ease !important;
+}
+
+body.dark-mode .nav-tabs .nav-link:hover {
+  color: var(--primary-color) !important;
+  background-color: rgba(97, 160, 255, 0.05) !important;
+  border-color: var(--border-color) !important;
+}
+
+body.dark-mode .nav-tabs .nav-link.active {
+  color: var(--primary-color) !important;
+  background-color: var(--bg-level-2) !important;
+  border-color: var(--border-color) !important;
+  border-bottom-color: var(--bg-level-2) !important;
+  font-weight: 500 !important;
+}
+
+/* 统一"访问原网页"按钮样式 */
+body.dark-mode .btn-primary,
+body.dark-mode .btn-outline-primary {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .btn-primary:hover,
+body.dark-mode .btn-outline-primary:hover {
+  background-color: #5090e0 !important;
+  border-color: #5090e0 !important;
+}
+
+body.dark-mode .btn-outline-primary {
+  background-color: transparent !important;
+  color: var(--primary-color) !important;
+}
+
+body.dark-mode .btn-outline-primary:hover {
+  background-color: rgba(97, 160, 255, 0.1) !important;
+  color: var(--primary-color) !important;
+}
+
+/* 确保一致的空间和边距 */
+body.dark-mode .list-group {
+  border-radius: 0 !important;
+  margin: 0 !important;
+}
+
+/* 调整文章项中的文本颜色 */
+body.dark-mode .list-group-item-action.active h6 {
+  color: var(--primary-color) !important;
+}
+
+body.dark-mode .list-group-item-action .text-muted {
+  color: #909090 !important;
+  opacity: 0.9 !important;
+}
+
+body.dark-mode .list-group-item-action:hover .text-muted {
+  color: #a0a0a0 !important;
+}
+
+/* 优化文章详情区域样式 */
+body.dark-mode .card,
+body.dark-mode .card-body {
+  background-color: var(--bg-level-2) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: none !important;
+}
+
+/* 调整文章详情区域的内容间距和风格 */
+body.dark-mode .tab-content {
+  background-color: var(--bg-level-2) !important;
+  border-left: 1px solid var(--border-color) !important;
+  border-right: 1px solid var(--border-color) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 1.5rem !important;
+  border-bottom-left-radius: 0.375rem !important;
+  border-bottom-right-radius: 0.375rem !important;
+}
+
+/* 优化访问原网页按钮 */
+body.dark-mode .btn-primary {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: white !important;
+  font-weight: 500 !important;
+  padding: 0.5rem 1rem !important;
+  transition: all 0.2s ease !important;
+}
+
+body.dark-mode .btn-primary:hover {
+  background-color: #5090e0 !important;
+  border-color: #5090e0 !important;
+}
+
+/* 统一文章详情页面中的文本样式 */
+body.dark-mode .markdown-content h1,
+body.dark-mode .markdown-content h2,
+body.dark-mode .markdown-content h3,
+body.dark-mode .markdown-content h4,
+body.dark-mode .markdown-content h5,
+body.dark-mode .markdown-content h6 {
+  color: #e0e0e0 !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 1rem !important;
+  font-weight: 600 !important;
+}
+
+body.dark-mode .markdown-content p,
+body.dark-mode .markdown-content li,
+body.dark-mode .markdown-content blockquote {
+  color: #d0d0d0 !important;
+  line-height: 1.6 !important;
+}
+
+body.dark-mode .markdown-content a {
+  color: var(--primary-color) !important;
+  text-decoration: none !important;
+}
+
+body.dark-mode .markdown-content a:hover {
+  text-decoration: underline !important;
+}
+
+body.dark-mode .markdown-content code {
+  background-color: var(--bg-level-3) !important;
+  padding: 0.2rem 0.4rem !important;
+  border-radius: 0.25rem !important;
+  color: #e6e6e6 !important;
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+}
+
+body.dark-mode .markdown-content pre {
+  background-color: var(--bg-level-3) !important;
+  padding: 1rem !important;
+  border-radius: 0.375rem !important;
+  overflow-x: auto !important;
+}
+
+/* 预览区域iframe样式调整 */
+body.dark-mode iframe {
+  border: 1px solid var(--border-color) !important;
+  border-radius: 0.375rem !important;
+}
+
+/* 添加文章内容区域之间的分隔效果 */
+body.dark-mode .markdown-content hr {
+  border-color: var(--border-color) !important;
+  margin: 1.5rem 0 !important;
+}
+
+/* 统一摘要/预览区域样式 */
+body.dark-mode .nav-tabs {
+  margin-bottom: 0 !important;
+  padding-left: 0.5rem !important;
+  padding-top: 0.5rem !important;
+}
+
+/* 创建视觉上的层级一致性 */
+body.dark-mode .flex-grow-1 {
+  border-radius: 0.375rem !important;
+  overflow: hidden !important;
+}
+
+/* 文章详情区域边框 */
+body.dark-mode .p-3,
+body.dark-mode .p-4 {
+  border-color: var(--border-color) !important;
+  background-color: var(--bg-level-2) !important;
+}
