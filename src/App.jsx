@@ -7,26 +7,36 @@ import Settings from './pages/Settings.jsx';
 import Navbar from './components/Navbar.jsx';
 import TestHeroicons from './components/TestHeroicons.jsx';
 import { ThemeProvider } from './contexts/ThemeContext';
+import authService from './services/authService';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
 
-  // 检查本地存储中是否有登录信息
+  // 检查认证状态
   useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (user) {
-      setIsAuthenticated(true);
-    }
+    const checkAuth = async () => {
+      try {
+        setIsLoading(true);
+        const isAuth = await authService.checkAuthStatus();
+        setIsAuthenticated(isAuth);
+      } catch (error) {
+        console.error('检查认证状态失败:', error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
   // 登录处理函数
   const handleLogin = async (username, password) => {
     try {
-      // 模拟API请求
-      const response = await mockApiLogin(username, password);
-      if (response.success) {
-        localStorage.setItem('user', JSON.stringify({ username, token: response.token }));
+      const result = await authService.login(username, password);
+      if (result.success) {
         setIsAuthenticated(true);
         return true;
       }
@@ -37,38 +47,32 @@ const App = () => {
     }
   };
 
-  // 模拟API登录请求
-  const mockApiLogin = async (username, password) => {
-    // 模拟网络延迟
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // 测试环境下的验证逻辑 - 任何用户名密码组合都能登录
-    // 在实际项目中，这里应该是真实的API调用
-    // return fetch('https://api.example.com/login', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ username, password })
-    // }).then(res => res.json());
-
-    // 测试账户设置 - 允许任何用户名和密码组合
-    return {
-      success: true,
-      token: 'test-jwt-token-' + Math.random().toString(36).substring(2),
-      message: '登录成功'
-    };
-  };
-
   // 登出处理函数
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    setIsAuthenticated(false);
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error('登出失败:', error);
+    }
   };
 
   // 路由保护组件
   const ProtectedRoute = ({ children }) => {
+    if (isLoading) {
+      return (
+        <div className="d-flex justify-content-center align-items-center" style={{height: '100vh'}}>
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">加载中...</span>
+          </div>
+        </div>
+      );
+    }
+
     if (!isAuthenticated) {
       return <Navigate to="/login" state={{ from: location }} replace />;
     }
+
     return children;
   };
 

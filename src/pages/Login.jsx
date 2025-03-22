@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTheme, ThemeMode } from '../contexts/ThemeContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const Login = ({ onLogin, isAuthenticated }) => {
+  const { themeMode } = useTheme();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -37,12 +39,12 @@ const Login = ({ onLogin, isAuthenticated }) => {
     }
 
     try {
-      // 模拟网络延迟
-      await new Promise(resolve => setTimeout(resolve, 800));
       const success = await onLogin(username, password);
       if (!success) {
         setError('用户名或密码不正确');
       }
+    } catch (error) {
+      setError('登录失败: ' + (error.message || '请稍后重试'));
     } finally {
       setIsLoading(false);
     }
@@ -57,7 +59,7 @@ const Login = ({ onLogin, isAuthenticated }) => {
         </div>
         <div className="card-body p-4">
           {error && (
-            <div className="alert alert-danger py-2 small" role="alert">
+            <div className={`alert py-2 small ${themeMode === ThemeMode.DARK ? 'alert-danger text-light border border-danger' : 'alert-danger'}`} role="alert">
               <i className="bi bi-exclamation-triangle-fill me-2"></i>
               {error}
             </div>
@@ -80,6 +82,7 @@ const Login = ({ onLogin, isAuthenticated }) => {
                   onChange={(e) => setUsername(e.target.value)}
                   required
                   style={{ height: '45px' }}
+                  autoComplete="username"
                 />
               </div>
             </div>
@@ -101,6 +104,7 @@ const Login = ({ onLogin, isAuthenticated }) => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   style={{ height: '45px' }}
+                  autoComplete="current-password"
                 />
               </div>
             </div>
@@ -142,7 +146,8 @@ const Login = ({ onLogin, isAuthenticated }) => {
               >
                 {isLoading ? (
                   <>
-                    <span className="spinner-border spinner-border-sm me-2" aria-hidden="true"></span><output>登录中...</output>
+                    <span className="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                    <span>登录中...</span>
                   </>
                 ) : '登录'}
               </button>

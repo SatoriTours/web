@@ -3,15 +3,18 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { marked } from 'marked';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import articlesData from '../assets/data/articles.json';
+import { articlesApi } from '../services/api';
 
 const Articles = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [articles, setArticles] = useState([]);
+  const [filteredArticles, setFilteredArticles] = useState([]);
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [newUrl, setNewUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState('');
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -25,33 +28,57 @@ const Articles = () => {
   const sidebarRef = useRef(null);
   const containerRef = useRef(null);
 
-  // 从JSON文件和localStorage加载文章
+  // 从API加载文章
   useEffect(() => {
-    const loadArticles = () => {
+    const loadArticles = async () => {
       try {
-        // 首先检查localStorage中是否已有数据
-        const savedArticles = localStorage.getItem('articles');
-        if (savedArticles) {
-          // 如果localStorage有数据，使用它
-          setArticles(JSON.parse(savedArticles));
-        } else {
-          // 否则使用JSON文件中的初始数据
-          setArticles(articlesData);
-          // 将初始数据也保存到localStorage
-          localStorage.setItem('articles', JSON.stringify(articlesData));
-        }
-        console.log('文章数据加载成功');
+        setIsLoading(true);
+        const data = await articlesApi.getAll();
+        setArticles(data);
+        setFilteredArticles(data);
+        setIsDataLoaded(true);
+        setIsLoading(false);
       } catch (error) {
         console.error('加载文章数据失败:', error);
-        // 如果出错，至少显示JSON文件中的数据
-        setArticles(articlesData);
-      } finally {
-        setIsDataLoaded(true);
+        setError('加载文章失败，请重试');
+        setIsLoading(false);
       }
     };
 
     loadArticles();
   }, []);
+
+  // 搜索文章
+  const handleSearch = async (value) => {
+    setSearchQuery(value);
+
+    if (!value.trim()) {
+      setFilteredArticles(articles);
+      return;
+    }
+
+    try {
+      setIsSearching(true);
+      const results = await articlesApi.search(value);
+      setFilteredArticles(results);
+    } catch (error) {
+      console.error('搜索文章失败:', error);
+      setError('搜索失败，请重试');
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // 延迟搜索，避免频繁请求
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (searchQuery !== undefined) {
+        handleSearch(searchQuery);
+      }
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
 
   // 加载选中的文章
   useEffect(() => {
@@ -250,7 +277,16 @@ const Articles = () => {
                 className="form-control border-start-0"
                 placeholder="搜索收藏..."
                 aria-label="搜索收藏"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
+              {isSearching && (
+                <span className="input-group-text bg-white border-start-0">
+                  <div className="spinner-border spinner-border-sm text-primary" role="status">
+                    <span className="visually-hidden">搜索中...</span>
+                  </div>
+                </span>
+              )}
             </div>
           </div>
 
@@ -261,22 +297,35 @@ const Articles = () => {
               </div>
               <p className="mt-3 text-muted">正在加载文章数据...</p>
             </div>
-          ) : articles.length === 0 ? (
+          ) : filteredArticles.length === 0 ? (
             <div className="text-center py-5">
-              <div className="py-5">
-                <div className="bg-light rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style={{width: '80px', height: '80px'}}>
-                  <i className="bi bi-bookmark display-4 text-primary opacity-75"></i>
+              {searchQuery ? (
+                <div className="py-5">
+                  <div className="bg-light rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style={{width: '80px', height: '80px'}}>
+                    <i className="bi bi-search display-4 text-secondary opacity-75"></i>
+                  </div>
+                  <h5 className="mb-2">未找到匹配结果</h5>
+                  <p className="text-muted mb-4">尝试使用不同的关键词搜索</p>
+                  <button className="btn btn-outline-secondary" onClick={() => setSearchQuery('')}>
+                    清除搜索
+                  </button>
                 </div>
-                <h5 className="mb-2">还没有收藏</h5>
-                <p className="text-muted mb-4">点击右上角的添加按钮收藏你喜欢的网页</p>
-                <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
-                  <i className="bi bi-plus me-1"></i>添加收藏
-                </button>
-              </div>
+              ) : (
+                <div className="py-5">
+                  <div className="bg-light rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style={{width: '80px', height: '80px'}}>
+                    <i className="bi bi-bookmark display-4 text-primary opacity-75"></i>
+                  </div>
+                  <h5 className="mb-2">还没有收藏</h5>
+                  <p className="text-muted mb-4">点击右上角的添加按钮收藏你喜欢的网页</p>
+                  <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+                    <i className="bi bi-plus me-1"></i>添加收藏
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <div className="list-group list-group-flush fade-in">
-              {articles.map(article => (
+              {filteredArticles.map(article => (
                 <div
                   key={article.id}
                   className={`list-group-item list-group-item-action border-0 border-bottom position-relative ${selectedArticle && selectedArticle.id === article.id ? 'active' : ''}`}

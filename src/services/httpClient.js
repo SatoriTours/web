@@ -13,6 +13,11 @@ class HttpClient {
       }
     };
 
+    // 添加credentials选项，用于处理跨域请求中的cookie
+    if (options.credentials) {
+      defaultOptions.credentials = options.credentials;
+    }
+
     const requestOptions = {
       ...defaultOptions,
       ...options

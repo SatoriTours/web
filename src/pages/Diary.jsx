@@ -5,7 +5,6 @@ import MDEditor from '@uiw/react-md-editor';
 import { useTheme, ThemeMode } from '../contexts/ThemeContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import diaryData from '../assets/data/diary.json';
 import { diaryApi } from '../services/api';
 
 const Diary = () => {
@@ -32,6 +31,9 @@ const Diary = () => {
   const [newDiaryTitle, setNewDiaryTitle] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [isAddingDiary, setIsAddingDiary] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [filteredEntries, setFilteredEntries] = useState([]);
 
   // 在组件加载时获取日记列表
   useEffect(() => {
@@ -40,6 +42,7 @@ const Diary = () => {
         setIsLoading(true);
         const entries = await diaryApi.getAll();
         setEntries(entries);
+        setFilteredEntries(entries);
         setIsLoading(false);
       } catch (error) {
         console.error('获取日记失败:', error);
@@ -277,6 +280,38 @@ const Diary = () => {
     };
   }, [isResizing]);
 
+  // 搜索日记
+  const handleSearch = async (value) => {
+    setSearchQuery(value);
+
+    if (!value.trim()) {
+      setFilteredEntries(entries);
+      return;
+    }
+
+    try {
+      setIsSearching(true);
+      const results = await diaryApi.search(value);
+      setFilteredEntries(results);
+    } catch (error) {
+      console.error('搜索日记失败:', error);
+      setError('搜索失败，请重试');
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // 延迟搜索，避免频繁请求
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (searchQuery !== undefined) {
+        handleSearch(searchQuery);
+      }
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
+
   return (
     <div className="container-fluid p-0" ref={containerRef}>
       <div className="d-flex vh-100">
@@ -326,7 +361,16 @@ const Diary = () => {
                   className="form-control border-start-0"
                   placeholder="搜索日记..."
                   aria-label="搜索日记"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
+                {isSearching && (
+                  <span className="input-group-text bg-white border-start-0">
+                    <div className="spinner-border spinner-border-sm text-primary" role="status">
+                      <span className="visually-hidden">搜索中...</span>
+                    </div>
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -339,22 +383,35 @@ const Diary = () => {
                 </div>
                 <p className="mt-3 text-muted">正在加载日记数据...</p>
               </div>
-            ) : entries.length === 0 ? (
+            ) : filteredEntries.length === 0 ? (
               <div className="text-center py-5">
-                <div className="py-5">
-                  <div className="bg-light rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style={{width: '80px', height: '80px'}}>
-                    <i className="bi bi-journal-text display-4 text-primary opacity-75"></i>
+                {searchQuery ? (
+                  <div className="py-5">
+                    <div className="bg-light rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style={{width: '80px', height: '80px'}}>
+                      <i className="bi bi-search display-4 text-secondary opacity-75"></i>
+                    </div>
+                    <h5 className="mb-2">未找到匹配结果</h5>
+                    <p className="text-muted mb-4">尝试使用不同的关键词搜索</p>
+                    <button className="btn btn-outline-secondary" onClick={() => setSearchQuery('')}>
+                      清除搜索
+                    </button>
                   </div>
-                  <h5 className="mb-2">还没有日记</h5>
-                  <p className="text-muted mb-4">记录你的思考、灵感和日常</p>
-                  <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
-                    <i className="bi bi-plus me-1"></i>写新日记
-                  </button>
-                </div>
+                ) : (
+                  <div className="py-5">
+                    <div className="bg-light rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style={{width: '80px', height: '80px'}}>
+                      <i className="bi bi-journal-text display-4 text-primary opacity-75"></i>
+                    </div>
+                    <h5 className="mb-2">还没有日记</h5>
+                    <p className="text-muted mb-4">记录你的思考、灵感和日常</p>
+                    <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+                      <i className="bi bi-plus me-1"></i>写新日记
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="list-group list-group-flush fade-in">
-                {entries.map((entry, index) => (
+                {filteredEntries.map((entry, index) => (
                   <div
                     key={entry.id || index}
                     className={`list-group-item list-group-item-action border-0 border-bottom position-relative ${selectedEntry && selectedEntry.id === entry.id ? 'active' : ''}`}

@@ -1,6 +1,5 @@
 import { IS_PRODUCTION, API_ENDPOINTS } from '../config';
 import httpClient from './httpClient';
-import mockService from './mockService';
 
 /**
  * 文章API服务
@@ -11,12 +10,7 @@ export const articlesApi = {
    * @returns {Promise<Array>} 文章列表
    */
   async getAll() {
-    if (IS_PRODUCTION) {
-      return httpClient.get(API_ENDPOINTS.ARTICLES.GET_ALL);
-    } else {
-      const mockData = mockService.getMockData('articles');
-      return mockService.mockGet(API_ENDPOINTS.ARTICLES.GET_ALL, mockData);
-    }
+    return httpClient.get(API_ENDPOINTS.ARTICLES.GET_ALL);
   },
 
   /**
@@ -25,12 +19,7 @@ export const articlesApi = {
    * @returns {Promise<Object>} 文章详情
    */
   async getById(id) {
-    if (IS_PRODUCTION) {
-      return httpClient.get(API_ENDPOINTS.ARTICLES.GET_BY_ID(id));
-    } else {
-      const mockData = mockService.getMockData('articles');
-      return mockService.mockGet(API_ENDPOINTS.ARTICLES.GET_BY_ID(id), mockData);
-    }
+    return httpClient.get(API_ENDPOINTS.ARTICLES.GET_BY_ID(id));
   },
 
   /**
@@ -39,12 +28,7 @@ export const articlesApi = {
    * @returns {Promise<Object>} 创建的文章
    */
   async create(data) {
-    if (IS_PRODUCTION) {
-      return httpClient.post(API_ENDPOINTS.ARTICLES.CREATE, data);
-    } else {
-      const mockData = mockService.getMockData('articles');
-      return mockService.mockPost(API_ENDPOINTS.ARTICLES.CREATE, data, mockData);
-    }
+    return httpClient.post(API_ENDPOINTS.ARTICLES.CREATE, data);
   },
 
   /**
@@ -54,12 +38,7 @@ export const articlesApi = {
    * @returns {Promise<Object>} 更新后的文章
    */
   async update(id, data) {
-    if (IS_PRODUCTION) {
-      return httpClient.put(API_ENDPOINTS.ARTICLES.UPDATE(id), data);
-    } else {
-      const mockData = mockService.getMockData('articles');
-      return mockService.mockPut(API_ENDPOINTS.ARTICLES.UPDATE(id), data, mockData);
-    }
+    return httpClient.put(API_ENDPOINTS.ARTICLES.UPDATE(id), data);
   },
 
   /**
@@ -68,12 +47,7 @@ export const articlesApi = {
    * @returns {Promise<null>} 空返回
    */
   async delete(id) {
-    if (IS_PRODUCTION) {
-      return httpClient.delete(API_ENDPOINTS.ARTICLES.DELETE(id));
-    } else {
-      const mockData = mockService.getMockData('articles');
-      return mockService.mockDelete(API_ENDPOINTS.ARTICLES.DELETE(id), mockData);
-    }
+    return httpClient.delete(API_ENDPOINTS.ARTICLES.DELETE(id));
   },
 
   /**
@@ -82,11 +56,16 @@ export const articlesApi = {
    * @returns {Promise<Object>} 从网页提取的文章信息
    */
   async fetchWebpageData(url) {
-    if (IS_PRODUCTION) {
-      return httpClient.post(API_ENDPOINTS.ARTICLES.FETCH_WEBPAGE, { url });
-    } else {
-      return mockService.mockFetchWebpage({ url });
-    }
+    return httpClient.post(API_ENDPOINTS.ARTICLES.FETCH_WEBPAGE, { url });
+  },
+
+  /**
+   * 搜索文章
+   * @param {string} query - 搜索关键词
+   * @returns {Promise<Array>} 搜索结果
+   */
+  async search(query) {
+    return httpClient.get(`${API_ENDPOINTS.ARTICLES.SEARCH}?q=${encodeURIComponent(query)}`);
   }
 };
 
@@ -99,12 +78,7 @@ export const diaryApi = {
    * @returns {Promise<Array>} 日记列表
    */
   async getAll() {
-    if (IS_PRODUCTION) {
-      return httpClient.get(API_ENDPOINTS.DIARY.GET_ALL);
-    } else {
-      const mockData = mockService.getMockData('diary');
-      return mockService.mockGet(API_ENDPOINTS.DIARY.GET_ALL, mockData);
-    }
+    return httpClient.get(API_ENDPOINTS.DIARY.GET_ALL);
   },
 
   /**
@@ -113,12 +87,7 @@ export const diaryApi = {
    * @returns {Promise<Object>} 日记详情
    */
   async getById(id) {
-    if (IS_PRODUCTION) {
-      return httpClient.get(API_ENDPOINTS.DIARY.GET_BY_ID(id));
-    } else {
-      const mockData = mockService.getMockData('diary');
-      return mockService.mockGet(API_ENDPOINTS.DIARY.GET_BY_ID(id), mockData);
-    }
+    return httpClient.get(API_ENDPOINTS.DIARY.GET_BY_ID(id));
   },
 
   /**
@@ -127,12 +96,7 @@ export const diaryApi = {
    * @returns {Promise<Object>} 创建的日记
    */
   async create(data) {
-    if (IS_PRODUCTION) {
-      return httpClient.post(API_ENDPOINTS.DIARY.CREATE, data);
-    } else {
-      const mockData = mockService.getMockData('diary');
-      return mockService.mockPost(API_ENDPOINTS.DIARY.CREATE, data, mockData);
-    }
+    return httpClient.post(API_ENDPOINTS.DIARY.CREATE, data);
   },
 
   /**
@@ -142,12 +106,7 @@ export const diaryApi = {
    * @returns {Promise<Object>} 更新后的日记
    */
   async update(id, data) {
-    if (IS_PRODUCTION) {
-      return httpClient.put(API_ENDPOINTS.DIARY.UPDATE(id), data);
-    } else {
-      const mockData = mockService.getMockData('diary');
-      return mockService.mockPut(API_ENDPOINTS.DIARY.UPDATE(id), data, mockData);
-    }
+    return httpClient.put(API_ENDPOINTS.DIARY.UPDATE(id), data);
   },
 
   /**
@@ -156,11 +115,15 @@ export const diaryApi = {
    * @returns {Promise<null>} 空返回
    */
   async delete(id) {
-    if (IS_PRODUCTION) {
-      return httpClient.delete(API_ENDPOINTS.DIARY.DELETE(id));
-    } else {
-      const mockData = mockService.getMockData('diary');
-      return mockService.mockDelete(API_ENDPOINTS.DIARY.DELETE(id), mockData);
-    }
+    return httpClient.delete(API_ENDPOINTS.DIARY.DELETE(id));
+  },
+
+  /**
+   * 搜索日记
+   * @param {string} query - 搜索关键词
+   * @returns {Promise<Array>} 搜索结果
+   */
+  async search(query) {
+    return httpClient.get(`${API_ENDPOINTS.DIARY.SEARCH}?q=${encodeURIComponent(query)}`);
   }
 };
