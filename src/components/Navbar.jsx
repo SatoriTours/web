@@ -1,9 +1,11 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './NavbarStyles.css';
 
 const Navbar = ({ onLogout }) => {
+  const location = useLocation();
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
       <div className="container-fluid">
@@ -25,7 +27,7 @@ const Navbar = ({ onLogout }) => {
               <NavLink
                 to="/articles"
                 className={({ isActive }) =>
-                  isActive
+                  isActive || location.pathname === "/"
                     ? "nav-link active fw-medium"
                     : "nav-link"
                 }

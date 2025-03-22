@@ -305,7 +305,10 @@ const Diary = () => {
       >
         <div className="sticky-top bg-white border-bottom">
           <div className="d-flex justify-content-between p-3 border-bottom">
-            <h5 className="mb-0 fw-bold">我的日记</h5>
+            <div className="d-flex align-items-center">
+              <i className="bi bi-journal-text text-primary me-2"></i>
+              <span className="fw-medium">我的日记</span>
+            </div>
             <div className="d-flex gap-2">
               <button
                 className="btn btn-sm btn-outline-secondary"

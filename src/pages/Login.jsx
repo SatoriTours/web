@@ -67,7 +67,7 @@ const Login = ({ onLogin, isAuthenticated }) => {
               <label htmlFor="username" className="form-label small fw-bold">
                 用户名
               </label>
-              <div className="input-group input-group-sm">
+              <div className="input-group">
                 <span className="input-group-text">
                   <i className="bi bi-person-fill"></i>
                 </span>
@@ -79,6 +79,7 @@ const Login = ({ onLogin, isAuthenticated }) => {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
+                  style={{ height: '45px' }}
                 />
               </div>
             </div>
@@ -87,7 +88,7 @@ const Login = ({ onLogin, isAuthenticated }) => {
               <label htmlFor="password" className="form-label small fw-bold">
                 密码
               </label>
-              <div className="input-group input-group-sm">
+              <div className="input-group">
                 <span className="input-group-text">
                   <i className="bi bi-lock-fill"></i>
                 </span>
@@ -99,6 +100,7 @@ const Login = ({ onLogin, isAuthenticated }) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  style={{ height: '45px' }}
                 />
               </div>
             </div>
@@ -116,16 +118,31 @@ const Login = ({ onLogin, isAuthenticated }) => {
               </div>
             </div>
 
-            <div className="d-grid">
+            <div className="d-grid mb-2 w-100">
               <button
                 type="submit"
-                className="btn btn-primary"
+                className="btn"
                 disabled={isLoading}
+                style={{
+                  padding: "0.5rem 1rem",
+                  fontSize: "1.1rem",
+                  fontWeight: "600",
+                  width: "100%",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  transition: "all 0.2s ease-in-out",
+                  height: '45px',
+                  backgroundColor: "var(--bs-primary, #0d6efd)",
+                  color: "#ffffff",
+                  border: "none",
+                  borderRadius: "4px",
+                  background: "linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%)",
+                  position: "relative",
+                  overflow: "hidden"
+                }}
               >
                 {isLoading ? (
                   <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    登录中...
+                    <span className="spinner-border spinner-border-sm me-2" aria-hidden="true"></span><output>登录中...</output>
                   </>
                 ) : '登录'}
               </button>
