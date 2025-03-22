@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { marked } from 'marked';
+import { articlesApi } from '../services/api';
 
 // 引入通用组件
 import Sidebar from '../components/common/Sidebar';
@@ -47,6 +48,23 @@ const ArticlesRefactored = () => {
     }
   }, [id, articles]);
 
+  // 在useEffect中使用articlesApi获取文章数据
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        setIsLoading(true);
+        const articles = await articlesApi.getAll();
+        setArticles(articles);
+        setIsLoading(false);
+      } catch (error) {
+        setError('获取文章列表失败，请重试');
+        setIsLoading(false);
+      }
+    };
+
+    fetchArticles();
+  }, []);
+
   // 模拟获取网页信息
   const fetchWebpage = async (url) => {
     // 实际项目中应连接到后端API进行网页爬取和AI摘要
@@ -61,51 +79,52 @@ const ArticlesRefactored = () => {
     };
   };
 
-  // 添加新文章
-  const handleAddArticle = async (e) => {
-    e.preventDefault();
-    setError('');
-
-    if (!newUrl.trim()) {
-      setError('请输入网址');
+  // 修改添加新文章函数
+  const handleAddArticle = async () => {
+    if (!newUrl) {
+      setError('请输入有效的URL');
       return;
     }
 
-    // 简单验证URL格式
     try {
-      new URL(newUrl);
-    } catch (err) {
-      setError('请输入有效的网址');
-      return;
-    }
+      setIsLoading(true);
+      setError(null);
 
-    setIsLoading(true);
+      // 使用API服务来获取网页数据
+      const newArticle = await articlesApi.fetchWebpageData(newUrl);
 
-    try {
-      const articleData = await fetchWebpage(newUrl);
-      const updatedArticles = [articleData, ...articles];
+      // 添加新文章
+      const updatedArticles = [newArticle, ...articles];
       setArticles(updatedArticles);
+
+      // 重置状态
       setNewUrl('');
       setShowAddModal(false);
-      setSelectedArticle(articleData);
-    } catch (err) {
-      setError('获取网页信息失败');
+      setSelectedArticle(newArticle);
+    } catch (error) {
+      setError('添加文章失败: ' + error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 删除文章
-  const handleDeleteArticle = (id, e) => {
-    if (e) {
-      e.stopPropagation();
-    }
+  // 修改删除文章函数
+  const handleDeleteArticle = async (article) => {
+    if (!article || !article.id) return;
 
-    const updatedArticles = articles.filter(article => article.id !== id);
-    setArticles(updatedArticles);
+    try {
+      await articlesApi.delete(article.id);
 
-    if (selectedArticle && selectedArticle.id === id) {
-      setSelectedArticle(updatedArticles.length > 0 ? updatedArticles[0] : null);
+      // 更新文章列表
+      const updatedArticles = await articlesApi.getAll();
+      setArticles(updatedArticles);
+
+      // 如果删除的是当前选中的文章，则清除选中状态
+      if (selectedArticle && selectedArticle.id === article.id) {
+        setSelectedArticle(null);
+      }
+    } catch (error) {
+      setError('删除文章失败: ' + error.message);
     }
   };
 
@@ -218,7 +237,7 @@ const ArticlesRefactored = () => {
                       </small>
                     </div>
                     <button
-                      onClick={(e) => handleDeleteArticle(article.id, e)}
+                      onClick={(e) => handleDeleteArticle(article)}
                       className="btn btn-sm text-danger border-0 position-absolute end-0 top-0 mt-2 me-2"
                       style={{
                         opacity: 0,
