@@ -1,0 +1,54 @@
+/* 分页控件样式 */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  padding: 15px 0;
+  background-color: var(--bg-color, #f8f9fa);
+  border-top: 1px solid var(--border-color, #dee2e6);
+}
+
+.pagination-container .pagination {
+  margin: 0;
+}
+
+.pagination-container .page-item .page-link {
+  border-radius: 4px;
+  margin: 0 2px;
+  border-color: var(--border-color, #dee2e6);
+  color: var(--text-color, #212529);
+}
+
+.pagination-container .page-item.active .page-link {
+  background-color: var(--primary-color, #0d6efd);
+  border-color: var(--primary-color, #0d6efd);
+  color: white;
+}
+
+.pagination-container .page-item.disabled .page-link {
+  color: var(--text-muted, #6c757d);
+  background-color: var(--bg-color, #f8f9fa);
+  border-color: var(--border-color, #dee2e6);
+}
+
+/* 暗色模式下的分页样式 */
+body.dark-mode .pagination-container {
+  background-color: var(--bg-color-dark, #343a40);
+}
+
+body.dark-mode .pagination-container .page-item .page-link {
+  background-color: var(--bg-color-dark, #343a40);
+  border-color: var(--border-color-dark, #495057);
+  color: var(--text-color-dark, #f8f9fa);
+}
+
+body.dark-mode .pagination-container .page-item.active .page-link {
+  background-color: var(--primary-color, #0d6efd);
+  border-color: var(--primary-color, #0d6efd);
+  color: white;
+}
+
+body.dark-mode .pagination-container .page-item.disabled .page-link {
+  background-color: var(--bg-color-dark, #343a40);
+  color: var(--text-muted-dark, #adb5bd);
+  border-color: var(--border-color-dark, #495057);
+}

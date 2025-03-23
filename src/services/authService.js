@@ -8,34 +8,33 @@ import httpClient from './httpClient';
 class AuthService {
   /**
    * 用户登录
-   * @param {string} username - 用户名
    * @param {string} password - 密码
    * @returns {Promise<object>} 登录结果
    */
-  async login(username, password) {
+  async login(password) {
     try {
       const response = await httpClient.post(API_ENDPOINTS.AUTH.LOGIN, {
-        username,
         password
       }, {
         credentials: 'include'
       });
 
-      // 存储用户信息
-      localStorage.setItem('user', JSON.stringify({
-        username: response.username,
-        name: response.name
-      }));
+      console.log(response.success);
+      console.log(response.data);
 
-      return {
-        success: true,
-        user: response
-      };
+      // 根据API响应格式处理
+      if (response.success) {
+        return {
+          success: true
+        };
+      } else {
+        throw new Error('登录响应格式不正确');
+      }
     } catch (error) {
       console.error('登录失败:', error);
       return {
         success: false,
-        message: error.message || '登录失败，请稍后重试'
+        message: error.message || '密码不正确，请重试'
       };
     }
   }
@@ -49,13 +48,11 @@ class AuthService {
       await httpClient.post(API_ENDPOINTS.AUTH.LOGOUT, {}, {
         credentials: 'include'
       });
+      return true;
     } catch (error) {
       console.error('登出请求失败:', error);
+      return false;
     }
-
-    // 清除本地存储
-    localStorage.removeItem('user');
-    return true;
   }
 
   /**
@@ -68,32 +65,27 @@ class AuthService {
         credentials: 'include'
       });
 
-      if (response.authenticated) {
-        // 更新本地存储中的用户信息
-        localStorage.setItem('user', JSON.stringify({
-          username: response.username,
-          name: response.name
-        }));
-        return true;
-      } else {
-        localStorage.removeItem('user');
-        return false;
-      }
+      return response.authenticated === true;
     } catch (error) {
       console.error('验证状态检查失败:', error);
-      localStorage.removeItem('user');
       return false;
     }
   }
 
   /**
    * 获取当前用户信息
-   * @returns {object|null} 用户信息
+   * @returns {Promise<object|null>} 用户信息
    */
-  getCurrentUser() {
+  async getCurrentUser() {
     try {
-      const user = localStorage.getItem('user');
-      return user ? JSON.parse(user) : null;
+      const response = await httpClient.get(API_ENDPOINTS.AUTH.STATUS, {
+        credentials: 'include'
+      });
+
+      if (response.authenticated && response.user) {
+        return response.user;
+      }
+      return null;
     } catch (error) {
       console.error('获取用户信息失败:', error);
       return null;

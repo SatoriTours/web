@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { marked } from 'marked';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -27,58 +27,84 @@ const Articles = () => {
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef(null);
   const containerRef = useRef(null);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    totalPages: 1,
+    totalItems: 0,
+    currentPage: 1
+  });
+
+  // 显示消息提示
+  const showMessage = (type, content) => {
+    setError(content);
+    // 几秒后清除错误信息
+    setTimeout(() => setError(''), 5000);
+  };
+
+  // 获取所有文章
+  const fetchArticles = useCallback(async (page = 1) => {
+    setLoading(true);
+    try {
+      const response = await articlesApi.getAll(page);
+      setArticles(response.data || []);
+      setPagination(response.pagination || {
+        totalPages: 1,
+        totalItems: response.data?.length || 0,
+        currentPage: page
+      });
+      setCurrentPage(page);
+    } catch (error) {
+      console.error('获取文章失败:', error);
+      showMessage('danger', '获取文章失败，请稍后重试');
+      setArticles([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // 搜索文章
+  const handleSearch = useCallback(async (query, page = 1) => {
+    if (!query.trim()) {
+      fetchArticles(page);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const response = await articlesApi.search(query, page);
+      setArticles(response.data || []);
+      setPagination(response.pagination || {
+        totalPages: 1,
+        totalItems: response.data?.length || 0,
+        currentPage: page
+      });
+      setCurrentPage(page);
+    } catch (error) {
+      console.error('搜索文章失败:', error);
+      showMessage('danger', '搜索失败，请稍后重试');
+    } finally {
+      setIsSearching(false);
+    }
+  }, [fetchArticles]);
 
   // 从API加载文章
   useEffect(() => {
     const loadArticles = async () => {
       try {
         setIsLoading(true);
-        const data = await articlesApi.getAll();
-        setArticles(data);
-        setFilteredArticles(data);
+        await fetchArticles();
         setIsDataLoaded(true);
-        setIsLoading(false);
       } catch (error) {
         console.error('加载文章数据失败:', error);
         setError('加载文章失败，请重试');
+      } finally {
         setIsLoading(false);
       }
     };
 
     loadArticles();
-  }, []);
-
-  // 搜索文章
-  const handleSearch = async (value) => {
-    setSearchQuery(value);
-
-    if (!value.trim()) {
-      setFilteredArticles(articles);
-      return;
-    }
-
-    try {
-      setIsSearching(true);
-      const results = await articlesApi.search(value);
-      setFilteredArticles(results);
-    } catch (error) {
-      console.error('搜索文章失败:', error);
-      setError('搜索失败，请重试');
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  // 延迟搜索，避免频繁请求
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (searchQuery !== undefined) {
-        handleSearch(searchQuery);
-      }
-    }, 300);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery]);
+  }, [fetchArticles]);
 
   // 加载选中的文章
   useEffect(() => {
@@ -229,6 +255,15 @@ const Articles = () => {
     };
   }, [isResizing]);
 
+  // 页码变化处理
+  const handlePageChange = (page) => {
+    if (searchQuery.trim()) {
+      handleSearch(searchQuery, page);
+    } else {
+      fetchArticles(page);
+    }
+  };
+
   return (
     <div ref={containerRef} className="container-fluid bg-light">
       <div className="row" style={{height: 'calc(100vh - 56px)'}}>
@@ -278,7 +313,14 @@ const Articles = () => {
                 placeholder="搜索收藏..."
                 aria-label="搜索收藏"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  if (!e.target.value.trim()) {
+                    fetchArticles(); // 如果搜索框清空，恢复显示所有文章
+                  } else if (e.target.value.trim().length >= 2) {
+                    handleSearch(e.target.value);
+                  }
+                }}
               />
               {isSearching && (
                 <span className="input-group-text bg-white border-start-0">
@@ -297,7 +339,7 @@ const Articles = () => {
               </div>
               <p className="mt-3 text-muted">正在加载文章数据...</p>
             </div>
-          ) : filteredArticles.length === 0 ? (
+          ) : articles.length === 0 ? (
             <div className="text-center py-5">
               {searchQuery ? (
                 <div className="py-5">
@@ -325,7 +367,7 @@ const Articles = () => {
             </div>
           ) : (
             <div className="list-group list-group-flush fade-in">
-              {filteredArticles.map(article => (
+              {articles.map(article => (
                 <div
                   key={article.id}
                   className={`list-group-item list-group-item-action border-0 border-bottom position-relative ${selectedArticle && selectedArticle.id === article.id ? 'active' : ''}`}
@@ -553,6 +595,53 @@ const Articles = () => {
               </form>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* 分页控件 */}
+      {articles.length > 0 && (
+        <div className="pagination-container">
+          <nav aria-label="分页导航">
+            <ul className="pagination">
+              <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                <button className="page-link" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                  &laquo;
+                </button>
+              </li>
+
+              {/* 生成页码按钮 */}
+              {Array.from({ length: Math.min(5, pagination.totalPages || 1) }, (_, i) => {
+                let pageNum;
+                if (pagination.totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= pagination.totalPages - 2) {
+                  pageNum = pagination.totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+
+                return (
+                  <li key={i} className={`page-item ${currentPage === pageNum ? 'active' : ''}`}>
+                    <button className="page-link" onClick={() => handlePageChange(pageNum)}>
+                      {pageNum}
+                    </button>
+                  </li>
+                );
+              })}
+
+              <li className={`page-item ${currentPage === pagination.totalPages ? 'disabled' : ''}`}>
+                <button
+                  className="page-link"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === pagination.totalPages}
+                >
+                  &raquo;
+                </button>
+              </li>
+            </ul>
+          </nav>
         </div>
       )}
     </div>

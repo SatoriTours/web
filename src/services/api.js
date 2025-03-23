@@ -7,10 +7,16 @@ import httpClient from './httpClient';
 export const articlesApi = {
   /**
    * 获取所有文章
-   * @returns {Promise<Array>} 文章列表
+   * @param {number} page - 页码，默认为1
+   * @param {number} pageSize - 每页数量，默认为10
+   * @returns {Promise<{data: Array, pagination: Object}>} 文章列表和分页信息
    */
-  async getAll() {
-    return httpClient.get(API_ENDPOINTS.ARTICLES.GET_ALL);
+  async getAll(page = 1, pageSize = 10) {
+    const response = await httpClient.get(`${API_ENDPOINTS.ARTICLES.GET_ALL}?page=${page}&pageSize=${pageSize}`);
+    return {
+      data: response.data,
+      pagination: response.pagination
+    };
   },
 
   /**
@@ -19,7 +25,8 @@ export const articlesApi = {
    * @returns {Promise<Object>} 文章详情
    */
   async getById(id) {
-    return httpClient.get(API_ENDPOINTS.ARTICLES.GET_BY_ID(id));
+    const response = await httpClient.get(API_ENDPOINTS.ARTICLES.GET_BY_ID(id));
+    return response.data;
   },
 
   /**
@@ -28,7 +35,8 @@ export const articlesApi = {
    * @returns {Promise<Object>} 创建的文章
    */
   async create(data) {
-    return httpClient.post(API_ENDPOINTS.ARTICLES.CREATE, data);
+    const response = await httpClient.post(API_ENDPOINTS.ARTICLES.CREATE, data);
+    return response.data;
   },
 
   /**
@@ -38,7 +46,8 @@ export const articlesApi = {
    * @returns {Promise<Object>} 更新后的文章
    */
   async update(id, data) {
-    return httpClient.put(API_ENDPOINTS.ARTICLES.UPDATE(id), data);
+    const response = await httpClient.put(API_ENDPOINTS.ARTICLES.UPDATE(id), data);
+    return response.data;
   },
 
   /**
@@ -47,7 +56,8 @@ export const articlesApi = {
    * @returns {Promise<null>} 空返回
    */
   async delete(id) {
-    return httpClient.delete(API_ENDPOINTS.ARTICLES.DELETE(id));
+    await httpClient.delete(API_ENDPOINTS.ARTICLES.DELETE(id));
+    return null;
   },
 
   /**
@@ -62,10 +72,18 @@ export const articlesApi = {
   /**
    * 搜索文章
    * @param {string} query - 搜索关键词
-   * @returns {Promise<Array>} 搜索结果
+   * @param {number} page - 页码，默认为1
+   * @param {number} pageSize - 每页数量，默认为10
+   * @returns {Promise<{data: Array, pagination: Object}>} 搜索结果和分页信息
    */
-  async search(query) {
-    return httpClient.get(`${API_ENDPOINTS.ARTICLES.SEARCH}?q=${encodeURIComponent(query)}`);
+  async search(query, page = 1, pageSize = 10) {
+    const response = await httpClient.get(
+      `${API_ENDPOINTS.ARTICLES.SEARCH}?q=${encodeURIComponent(query)}&page=${page}&pageSize=${pageSize}`
+    );
+    return {
+      data: response.data,
+      pagination: response.pagination
+    };
   }
 };
 
@@ -75,10 +93,16 @@ export const articlesApi = {
 export const diaryApi = {
   /**
    * 获取所有日记
-   * @returns {Promise<Array>} 日记列表
+   * @param {number} page - 页码，默认为1
+   * @param {number} pageSize - 每页数量，默认为10
+   * @returns {Promise<{data: Array, pagination: Object}>} 日记列表和分页信息
    */
-  async getAll() {
-    return httpClient.get(API_ENDPOINTS.DIARY.GET_ALL);
+  async getAll(page = 1, pageSize = 10) {
+    const response = await httpClient.get(`${API_ENDPOINTS.DIARY.GET_ALL}?page=${page}&pageSize=${pageSize}`);
+    return {
+      data: response.data,
+      pagination: response.pagination
+    };
   },
 
   /**
@@ -87,7 +111,8 @@ export const diaryApi = {
    * @returns {Promise<Object>} 日记详情
    */
   async getById(id) {
-    return httpClient.get(API_ENDPOINTS.DIARY.GET_BY_ID(id));
+    const response = await httpClient.get(API_ENDPOINTS.DIARY.GET_BY_ID(id));
+    return response.data;
   },
 
   /**
@@ -96,7 +121,8 @@ export const diaryApi = {
    * @returns {Promise<Object>} 创建的日记
    */
   async create(data) {
-    return httpClient.post(API_ENDPOINTS.DIARY.CREATE, data);
+    const response = await httpClient.post(API_ENDPOINTS.DIARY.CREATE, data);
+    return response.data;
   },
 
   /**
@@ -106,7 +132,8 @@ export const diaryApi = {
    * @returns {Promise<Object>} 更新后的日记
    */
   async update(id, data) {
-    return httpClient.put(API_ENDPOINTS.DIARY.UPDATE(id), data);
+    const response = await httpClient.put(API_ENDPOINTS.DIARY.UPDATE(id), data);
+    return response.data;
   },
 
   /**
@@ -115,15 +142,24 @@ export const diaryApi = {
    * @returns {Promise<null>} 空返回
    */
   async delete(id) {
-    return httpClient.delete(API_ENDPOINTS.DIARY.DELETE(id));
+    await httpClient.delete(API_ENDPOINTS.DIARY.DELETE(id));
+    return null;
   },
 
   /**
    * 搜索日记
    * @param {string} query - 搜索关键词
-   * @returns {Promise<Array>} 搜索结果
+   * @param {number} page - 页码，默认为1
+   * @param {number} pageSize - 每页数量，默认为10
+   * @returns {Promise<{data: Array, pagination: Object}>} 搜索结果和分页信息
    */
-  async search(query) {
-    return httpClient.get(`${API_ENDPOINTS.DIARY.SEARCH}?q=${encodeURIComponent(query)}`);
+  async search(query, page = 1, pageSize = 10) {
+    const response = await httpClient.get(
+      `${API_ENDPOINTS.DIARY.SEARCH}?q=${encodeURIComponent(query)}&page=${page}&pageSize=${pageSize}`
+    );
+    return {
+      data: response.data,
+      pagination: response.pagination
+    };
   }
 };

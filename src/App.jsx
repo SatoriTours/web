@@ -33,9 +33,9 @@ const App = () => {
   }, []);
 
   // 登录处理函数
-  const handleLogin = async (username, password) => {
+  const handleLogin = async (password) => {
     try {
-      const result = await authService.login(username, password);
+      const result = await authService.login(password);
       if (result.success) {
         setIsAuthenticated(true);
         return true;

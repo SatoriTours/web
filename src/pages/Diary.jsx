@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { marked } from 'marked';
 import MDEditor from '@uiw/react-md-editor';
@@ -34,25 +34,33 @@ const Diary = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [filteredEntries, setFilteredEntries] = useState([]);
+  const [diaries, setDiaries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    totalPages: 1,
+    totalItems: 0,
+    currentPage: 1
+  });
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   // 在组件加载时获取日记列表
   useEffect(() => {
-    const fetchDiaryEntries = async () => {
+    const loadDiaries = async () => {
       try {
         setIsLoading(true);
-        const entries = await diaryApi.getAll();
-        setEntries(entries);
-        setFilteredEntries(entries);
-        setIsLoading(false);
+        await fetchDiaries();
+        setIsDataLoaded(true);
       } catch (error) {
-        console.error('获取日记失败:', error);
-        setError('获取日记失败，请重试');
+        console.error('加载日记数据失败:', error);
+        setError('加载日记失败，请重试');
+      } finally {
         setIsLoading(false);
       }
     };
 
-    fetchDiaryEntries();
-  }, []);
+    loadDiaries();
+  }, [fetchDiaries]);
 
   // 更新编辑器的暗黑/亮色模式
   useEffect(() => {
@@ -280,37 +288,67 @@ const Diary = () => {
     };
   }, [isResizing]);
 
-  // 搜索日记
-  const handleSearch = async (value) => {
-    setSearchQuery(value);
+  // 显示消息提示
+  const showMessage = (type, content) => {
+    setError(content);
+    // 几秒后清除错误信息
+    setTimeout(() => setError(''), 5000);
+  };
 
-    if (!value.trim()) {
-      setFilteredEntries(entries);
+  // 获取所有日记
+  const fetchDiaries = useCallback(async (page = 1) => {
+    setLoading(true);
+    try {
+      const response = await diaryApi.getAll(page);
+      setDiaries(response.data || []);
+      setPagination(response.pagination || {
+        totalPages: 1,
+        totalItems: response.data?.length || 0,
+        currentPage: page
+      });
+      setCurrentPage(page);
+    } catch (error) {
+      console.error('获取日记失败:', error);
+      showMessage('danger', '获取日记失败，请稍后重试');
+      setDiaries([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // 搜索日记
+  const handleSearch = useCallback(async (query, page = 1) => {
+    if (!query.trim()) {
+      fetchDiaries(page);
       return;
     }
 
+    setIsSearching(true);
     try {
-      setIsSearching(true);
-      const results = await diaryApi.search(value);
-      setFilteredEntries(results);
+      const response = await diaryApi.search(query, page);
+      setDiaries(response.data || []);
+      setPagination(response.pagination || {
+        totalPages: 1,
+        totalItems: response.data?.length || 0,
+        currentPage: page
+      });
+      setCurrentPage(page);
     } catch (error) {
       console.error('搜索日记失败:', error);
-      setError('搜索失败，请重试');
+      showMessage('danger', '搜索失败，请稍后重试');
     } finally {
       setIsSearching(false);
     }
+  }, [fetchDiaries]);
+
+  // 页码变化处理
+  const handlePageChange = (page) => {
+    if (searchQuery.trim()) {
+      handleSearch(searchQuery, page);
+    } else {
+      fetchDiaries(page);
+    }
   };
-
-  // 延迟搜索，避免频繁请求
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (searchQuery !== undefined) {
-        handleSearch(searchQuery);
-      }
-    }, 300);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery]);
 
   return (
     <div className="container-fluid p-0" ref={containerRef}>
@@ -362,7 +400,14 @@ const Diary = () => {
                   placeholder="搜索日记..."
                   aria-label="搜索日记"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    if (!e.target.value.trim()) {
+                      setDiaries(entries); // 如果搜索框清空，恢复显示所有日记
+                    } else if (e.target.value.trim().length >= 2) {
+                      handleSearch(e.target.value);
+                    }
+                  }}
                 />
                 {isSearching && (
                   <span className="input-group-text bg-white border-start-0">
@@ -383,35 +428,23 @@ const Diary = () => {
                 </div>
                 <p className="mt-3 text-muted">正在加载日记数据...</p>
               </div>
-            ) : filteredEntries.length === 0 ? (
+            ) : diaries.length === 0 ? (
               <div className="text-center py-5">
                 {searchQuery ? (
-                  <div className="py-5">
-                    <div className="bg-light rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style={{width: '80px', height: '80px'}}>
-                      <i className="bi bi-search display-4 text-secondary opacity-75"></i>
-                    </div>
-                    <h5 className="mb-2">未找到匹配结果</h5>
-                    <p className="text-muted mb-4">尝试使用不同的关键词搜索</p>
-                    <button className="btn btn-outline-secondary" onClick={() => setSearchQuery('')}>
-                      清除搜索
-                    </button>
-                  </div>
+                  <>
+                    <i className="bi bi-search fs-1 text-muted"></i>
+                    <p className="mt-3 text-muted">未找到匹配的日记</p>
+                  </>
                 ) : (
-                  <div className="py-5">
-                    <div className="bg-light rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style={{width: '80px', height: '80px'}}>
-                      <i className="bi bi-journal-text display-4 text-primary opacity-75"></i>
-                    </div>
-                    <h5 className="mb-2">还没有日记</h5>
-                    <p className="text-muted mb-4">记录你的思考、灵感和日常</p>
-                    <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
-                      <i className="bi bi-plus me-1"></i>写新日记
-                    </button>
-                  </div>
+                  <>
+                    <i className="bi bi-journal-text fs-1 text-muted"></i>
+                    <p className="mt-3 text-muted">还没有日记，创建一个吧</p>
+                  </>
                 )}
               </div>
             ) : (
               <div className="list-group list-group-flush fade-in">
-                {filteredEntries.map((entry, index) => (
+                {diaries.map((entry, index) => (
                   <div
                     key={entry.id || index}
                     className={`list-group-item list-group-item-action border-0 border-bottom position-relative ${selectedEntry && selectedEntry.id === entry.id ? 'active' : ''}`}
@@ -627,6 +660,53 @@ const Diary = () => {
           onMouseDown={handleMouseDown}
           onTouchStart={handleTouchStart}
         ></div>
+
+        {/* 分页控件 */}
+        {diaries.length > 0 && (
+          <div className="pagination-container">
+            <nav aria-label="分页导航">
+              <ul className="pagination">
+                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                  <button className="page-link" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                    &laquo;
+                  </button>
+                </li>
+
+                {/* 生成页码按钮 */}
+                {Array.from({ length: Math.min(5, pagination.totalPages || 1) }, (_, i) => {
+                  let pageNum;
+                  if (pagination.totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= pagination.totalPages - 2) {
+                    pageNum = pagination.totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+
+                  return (
+                    <li key={i} className={`page-item ${currentPage === pageNum ? 'active' : ''}`}>
+                      <button className="page-link" onClick={() => handlePageChange(pageNum)}>
+                        {pageNum}
+                      </button>
+                    </li>
+                  );
+                })}
+
+                <li className={`page-item ${currentPage === pagination.totalPages ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === pagination.totalPages}
+                  >
+                    &raquo;
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -6,7 +6,6 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const Login = ({ onLogin, isAuthenticated }) => {
   const { themeMode } = useTheme();
-  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -26,12 +25,6 @@ const Login = ({ onLogin, isAuthenticated }) => {
     setError('');
     setIsLoading(true);
 
-    if (!username.trim()) {
-      setError('请输入用户名');
-      setIsLoading(false);
-      return;
-    }
-
     if (!password.trim()) {
       setError('请输入密码');
       setIsLoading(false);
@@ -39,9 +32,10 @@ const Login = ({ onLogin, isAuthenticated }) => {
     }
 
     try {
-      const success = await onLogin(username, password);
+      // 只使用密码进行登录
+      const success = await onLogin(password);
       if (!success) {
-        setError('用户名或密码不正确');
+        setError('密码不正确');
       }
     } catch (error) {
       setError('登录失败: ' + (error.message || '请稍后重试'));
@@ -51,8 +45,8 @@ const Login = ({ onLogin, isAuthenticated }) => {
   };
 
   return (
-    <div className="container-fluid bg-light min-vh-100 d-flex align-items-center justify-content-center py-5">
-      <div className="card border-0 shadow-lg" style={{ maxWidth: '400px', width: '100%' }}>
+    <div className={`container-fluid min-vh-100 d-flex align-items-center justify-content-center py-5 ${themeMode === ThemeMode.DARK ? 'bg-dark' : 'bg-light'}`}>
+      <div className={`card border-0 shadow-lg ${themeMode === ThemeMode.DARK ? 'bg-dark text-light' : ''}`} style={{ maxWidth: '400px', width: '100%' }}>
         <div className="card-header bg-primary text-white text-center py-4">
           <h2 className="mb-0 fs-4">Daily Satori</h2>
           <p className="mb-0 small">记录当下，思考未来</p>
@@ -65,39 +59,17 @@ const Login = ({ onLogin, isAuthenticated }) => {
             </div>
           )}
           <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label htmlFor="username" className="form-label small fw-bold">
-                用户名
-              </label>
-              <div className="input-group">
-                <span className="input-group-text">
-                  <i className="bi bi-person-fill"></i>
-                </span>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="username"
-                  placeholder="请输入用户名"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                  style={{ height: '45px' }}
-                  autoComplete="username"
-                />
-              </div>
-            </div>
-
-            <div className="mb-3">
-              <label htmlFor="password" className="form-label small fw-bold">
+            <div className="mb-4">
+              <label htmlFor="password" className={`form-label small fw-bold ${themeMode === ThemeMode.DARK ? 'text-light' : ''}`}>
                 密码
               </label>
               <div className="input-group">
-                <span className="input-group-text">
+                <span className={`input-group-text ${themeMode === ThemeMode.DARK ? 'bg-secondary text-light border-secondary' : ''}`}>
                   <i className="bi bi-lock-fill"></i>
                 </span>
                 <input
                   type="password"
-                  className="form-control"
+                  className={`form-control ${themeMode === ThemeMode.DARK ? 'bg-dark text-light border-secondary' : ''}`}
                   id="password"
                   placeholder="请输入密码"
                   value={password}
@@ -116,7 +88,7 @@ const Login = ({ onLogin, isAuthenticated }) => {
                   type="checkbox"
                   id="rememberMe"
                 />
-                <label className="form-check-label small" htmlFor="rememberMe">
+                <label className={`form-check-label small ${themeMode === ThemeMode.DARK ? 'text-light' : ''}`} htmlFor="rememberMe">
                   记住我
                 </label>
               </div>
